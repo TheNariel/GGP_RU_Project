@@ -3,7 +3,7 @@ Project for General game playing class at University of Reykjavik.
 The whole project, during which you will implement a complete general game player and ex-
 periment with some advanced topics, is split into several parts:
 
-• implementing a reasoner for GDL  (currently working on)
+• implementing a reasoner for GDL  (currently worked on)
 
 • solving simple games using search
 
