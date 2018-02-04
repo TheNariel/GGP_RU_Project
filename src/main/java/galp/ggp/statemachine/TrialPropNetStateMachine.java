@@ -24,7 +24,7 @@ import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
 public class TrialPropNetStateMachine extends StateMachine {
 	private MachineState initialState;
 	private ImmutableList<Role> roles;
-	 private PropNet propNet;
+	private PropNet propNet;
 	PropNetStructure structure = null;
 	String gdlFileName = "D:\\Projects\\GGP\\base_git\\GGP_RU_Project\\src\\main\\java\\galp\\ggp\\main\\out.txt";
 
@@ -37,8 +37,8 @@ public class TrialPropNetStateMachine extends StateMachine {
 		System.out.println("TG");
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
 		try {
-			 propNet = OptimizingPropNetFactory.create(description);
-			 structure = factory.create(description);
+			propNet = OptimizingPropNetFactory.create(description);
+			structure = factory.create(description);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,9 +52,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 	}
 
 	private MachineState computeInitialState() {
-
-		for(BaseProposition prop: structure.getBasePropositions()) {
-			System.out.println(prop.toString());
+		System.out.println(propNet.getInitProposition());
+		for (BaseProposition prop : structure.getBasePropositions()) {
+			System.out.println(prop);
 		}
 		return null;
 	}
