@@ -92,6 +92,7 @@ public class SamplePropNetStateMachine extends StateMachine {
     @Override
     public List<Move> getLegalMoves(MachineState state, Role role)
             throws MoveDefinitionException {
+
         // TODO: Compute legal moves.
         return null;
     }

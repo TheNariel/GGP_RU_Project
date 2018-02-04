@@ -12,7 +12,7 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
-import galp.ggp.statemachine.TrialProverStateMachine;
+import galp.ggp.statemachine.TrialPropNetStateMachine;
 
 public class TrialSampleGamer extends StateMachineGamer {
 
@@ -57,7 +57,7 @@ public class TrialSampleGamer extends StateMachineGamer {
 	// This is the default State Machine
 	@Override
 	public StateMachine getInitialStateMachine() {
-		return new CachedStateMachine(new TrialProverStateMachine());
+		return new CachedStateMachine(new TrialPropNetStateMachine());
 	}
 
 	// This is the defaul Sample Panel

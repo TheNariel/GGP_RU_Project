@@ -1,13 +1,9 @@
 package galp.ggp.statemachine;
 
-import java.util.HashSet;
+import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import org.ggp.base.util.gdl.grammar.Gdl;
-import org.ggp.base.util.gdl.grammar.GdlSentence;
-import org.ggp.base.util.prover.Prover;
-import org.ggp.base.util.prover.aima.AimaProver;
 import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
@@ -15,32 +11,42 @@ import org.ggp.base.util.statemachine.StateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
-import org.ggp.base.util.statemachine.implementation.prover.query.ProverQueryBuilder;
-import org.ggp.base.util.statemachine.implementation.prover.result.ProverResultParser;
 
 import com.google.common.collect.ImmutableList;
 
-public class TrialProverStateMachine extends StateMachine {
-	private MachineState initialState;
-	private Prover prover;
-	private ImmutableList<Role> roles;
+import is.ru.cadia.ggp.propnet.structure.GGPBasePropNetStructureFactory;
+import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
+import is.ru.cadia.ggp.propnet.structure.PropNetStructureFactory;
 
-	public TrialProverStateMachine() {
+public class TrialPropNetStateMachine extends StateMachine {
+	private MachineState initialState;
+	private ImmutableList<Role> roles;
+	PropNetStructure structure = null;
+	String gdlFileName = "D:\\Projects\\GGP\\base_git\\GGP_RU_Project\\src\\main\\java\\galp\\ggp\\main\\out.txt";
+
+	public TrialPropNetStateMachine() {
 
 	}
 
 	@Override
 	public void initialize(List<Gdl> description) {
-
-        prover = new AimaProver(description);
-		roles = ImmutableList.copyOf(Role.computeRoles(description));
+		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
+		try {
+			 structure = factory.create(description);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("TESTING");
+		structure.renderToFile(new File(gdlFileName));
+		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = computeInitialState();
 
 	}
 
 	private MachineState computeInitialState() {
-		Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getInitQuery(), new HashSet<GdlSentence>());
-		return new ProverResultParser().toState(results);
+		//Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getInitQuery(), new HashSet<GdlSentence>());
+		return null;
 	}
 
 	@Override
