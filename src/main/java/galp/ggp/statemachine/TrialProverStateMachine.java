@@ -31,7 +31,7 @@ public class TrialProverStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
-
+System.out.println("test");
         prover = new AimaProver(description);
 		roles = ImmutableList.copyOf(Role.computeRoles(description));
 		initialState = computeInitialState();
@@ -39,7 +39,11 @@ public class TrialProverStateMachine extends StateMachine {
 	}
 
 	private MachineState computeInitialState() {
+		System.out.println("test");
 		Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getInitQuery(), new HashSet<GdlSentence>());
+		for (GdlSentence s : results) {
+			System.out.print(s.toString());
+		}
 		return new ProverResultParser().toState(results);
 	}
 
