@@ -1,11 +1,11 @@
 package is.ru.cadia.ggp.propnet.structure.components;
 
-import is.ru.cadia.ggp.propnet.structure.ComponentFilter;
-
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import org.ggp.base.util.gdl.grammar.GdlSentence;
+
+import is.ru.cadia.ggp.propnet.structure.ComponentFilter;
 
 @SuppressWarnings("serial")
 public class BaseProposition extends StaticComponent {
@@ -52,7 +52,8 @@ public class BaseProposition extends StaticComponent {
 		for (GdlSentence sentence : sentences) {
 			sb.append(sentence.toString()).append(", ");
 		}
-		sb.append("]}");
+		sb.append("]} initValue: ");
+		sb.append(initialValue);
 		return sb.toString();
 	}
 }

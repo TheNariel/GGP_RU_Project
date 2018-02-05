@@ -16,14 +16,17 @@ public class trialMain {
 	public static void main(String[] args) throws IOException, MoveDefinitionException, TransitionDefinitionException {
 		// setting up the state machine
 
-		String gdlFileName = ".\\src\\main\\java\\galp\\ggp\\main\\game.txt";
+		String gdlFileName = ".//src//main//java//galp//ggp//main//game.txt";
 
-		// String gdlFileName = ".\\src\\main\\java\\galp\\ggp\\main\\realySmallGame.txt";
+		//String gdlFileName = ".//src//main//java//galp//ggp//main//realySmallGame.txt";
+
 		String gameDescription = IOUtils.readFile(new File(gdlFileName));
 		String preprocessedRules = Game.preprocessRulesheet(gameDescription);
 		Game ggpBaseGame = Game.createEphemeralGame(preprocessedRules);
 
 		StateMachine stateMachine = new TrialPropNetStateMachine(); // insert your own machine here
+		//StateMachine stateMachine = new TrialProverStateMachine(); // insert your own machine here
+
 		stateMachine.initialize(ggpBaseGame.getRules());
 
 		// some testing

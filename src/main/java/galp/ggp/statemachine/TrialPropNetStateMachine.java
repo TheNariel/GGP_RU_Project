@@ -1,14 +1,17 @@
 package galp.ggp.statemachine;
 
-import java.io.File;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.ggp.base.util.gdl.grammar.Gdl;
-import org.ggp.base.util.propnet.architecture.PropNet;
-import org.ggp.base.util.propnet.factory.OptimizingPropNetFactory;
+import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
+import org.ggp.base.util.statemachine.SimpleMachineState;
 import org.ggp.base.util.statemachine.StateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
@@ -22,11 +25,11 @@ import is.ru.cadia.ggp.propnet.structure.PropNetStructureFactory;
 import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
 
 public class TrialPropNetStateMachine extends StateMachine {
+	BitSet state;
 	private MachineState initialState;
 	private ImmutableList<Role> roles;
-	private PropNet propNet;
 	PropNetStructure structure = null;
-	String gdlFileName = "D:\\Projects\\GGP\\base_git\\GGP_RU_Project\\src\\main\\java\\galp\\ggp\\main\\out.txt";
+	String gdlFileName = ".//src//main//java//galp//ggp//main//out.txt";
 
 	public TrialPropNetStateMachine() {
 
@@ -34,29 +37,112 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
-		System.out.println("TG");
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
 		try {
-			propNet = OptimizingPropNetFactory.create(description);
 			structure = factory.create(description);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		System.out.println("TESTING");
-		structure.renderToFile(new File(gdlFileName));
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = computeInitialState();
+		state = new BitSet(structure.getNbComponents());
 
+		// structure.renderToFile(new File(gdlFileName));
 	}
 
 	private MachineState computeInitialState() {
-		System.out.println(propNet.getInitProposition());
+		Set<GdlSentence> contents = new Set<GdlSentence>() {
+
+			@Override
+			public <T> T[] toArray(T[] arg0) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public Object[] toArray() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public int size() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public boolean retainAll(Collection<?> arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean removeAll(Collection<?> arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean remove(Object arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public Iterator<GdlSentence> iterator() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public boolean isEmpty() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean containsAll(Collection<?> arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean contains(Object arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public void clear() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public boolean addAll(Collection<? extends GdlSentence> arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public boolean add(GdlSentence arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		};
+
 		for (BaseProposition prop : structure.getBasePropositions()) {
-			System.out.println(prop);
+			if (prop.initialValue) {
+				GdlSentence[] sentences = prop.sentences;
+//todo initial state.
+			}
+
 		}
-		return null;
+		SimpleMachineState ret = new SimpleMachineState(contents);
+		return ret;
 	}
 
 	@Override
@@ -74,7 +160,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 	@Override
 	public List<Role> getRoles() {
 		// TODO Auto-generated method stub
-		return null;
+		return roles;
 	}
 
 	@Override
