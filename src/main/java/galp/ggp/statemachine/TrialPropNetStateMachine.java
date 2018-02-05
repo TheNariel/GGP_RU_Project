@@ -43,9 +43,12 @@ public class TrialPropNetStateMachine extends StateMachine {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		state = new BitSet(structure.getNbComponents());
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = computeInitialState();
+
+		//System.out.println(state.get(33));
 		// structure.renderToFile(new File(gdlFileName));
 	}
 
@@ -54,15 +57,13 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		for (BaseProposition prop : structure.getBasePropositions()) {
 			if (prop.initialValue) {
+				state.set(prop.id);
 				GdlSentence[] sentences = prop.sentences;
 				for (int i = 0; i < sentences.length; i++) {
 					contents.add(sentences[i]);
 				}
 			}
 
-		}
-		for (GdlSentence s : contents) {
-			System.out.println(s.toString());
 		}
 		SimpleMachineState ret = new SimpleMachineState(contents);
 		return ret;
