@@ -1,8 +1,7 @@
 package galp.ggp.statemachine;
 
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,99 +46,23 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = computeInitialState();
-		state = new BitSet(structure.getNbComponents());
-
 		// structure.renderToFile(new File(gdlFileName));
 	}
 
 	private MachineState computeInitialState() {
-		Set<GdlSentence> contents = new Set<GdlSentence>() {
-
-			@Override
-			public <T> T[] toArray(T[] arg0) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Object[] toArray() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public int size() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-
-			@Override
-			public boolean retainAll(Collection<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean removeAll(Collection<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean remove(Object arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public Iterator<GdlSentence> iterator() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public boolean isEmpty() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean containsAll(Collection<?> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean contains(Object arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public void clear() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public boolean addAll(Collection<? extends GdlSentence> arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean add(GdlSentence arg0) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		};
+		Set<GdlSentence> contents = new HashSet<GdlSentence>();
 
 		for (BaseProposition prop : structure.getBasePropositions()) {
 			if (prop.initialValue) {
 				GdlSentence[] sentences = prop.sentences;
-//todo initial state.
+				for (int i = 0; i < sentences.length; i++) {
+					contents.add(sentences[i]);
+				}
 			}
 
+		}
+		for (GdlSentence s : contents) {
+			System.out.println(s.toString());
 		}
 		SimpleMachineState ret = new SimpleMachineState(contents);
 		return ret;
