@@ -60,7 +60,13 @@ public class TrialPropNetStateMachine extends StateMachine {
 		for (Move s : legals) {
 			System.out.println(s.toString());
 		}
-
+		try {
+			System.out.println(getGoal(initialState,roles.get(0)));
+		} catch (GoalDefinitionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(isTerminal(initialState));
 	}
 
 	private MachineState computeInitialState() {
@@ -79,12 +85,20 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public int getGoal(MachineState state, Role role) throws GoalDefinitionException {
-		// TODO Auto-generated method stub
+		int roleid = structure.getRoleId(role);
+		StaticComponent[] Goals = structure.getGoalPropositions(roleid);
+		for(int i = 0; i < Goals.length;i++) {
+			boolean legal = checkLegality(state,Goals[i]);
+			if(legal) {return structure.getGoalValues(roleid)[i];}
+		}
 		return 0;
 	}
 
 	@Override
 	public boolean isTerminal(MachineState state) {
+		StaticComponent Term = structure.getTerminalProposition();
+		boolean terminal = checkLegality(state,Term);
+		if(terminal) return true;
 
 		return false;
 	}
