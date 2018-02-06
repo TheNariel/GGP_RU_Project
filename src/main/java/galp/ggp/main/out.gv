@@ -1,0 +1,52 @@
+digraph propNet {
+"@0"[shape=doublecircle, style=filled, fillcolor=grey, label="( true ( color r1 red ) )
+"];
+
+"@10"->"@0"; 
+"@1"[shape=doublecircle, style=filled, fillcolor=grey, label="( true ( color r1 yellow ) )
+"];
+
+"@16"->"@1"; 
+"@2"[shape=doublecircle, style=filled, fillcolor=grey, label="( true ( color r2 red ) )
+"];
+
+"@20"->"@2"; 
+"@3"[shape=doublecircle, style=filled, fillcolor=grey, label="( true ( color r2 yellow ) )
+"];
+
+"@8"->"@3"; 
+"@4"[shape=invhouse, style=filled, fillcolor=grey, label="4"];
+"@2"->"@4"; "@1"->"@4"; 
+"@5"[shape=invhouse, style=filled, fillcolor=grey, label="5"];
+"@3"->"@5"; "@0"->"@5"; 
+"@6"[shape=ellipse, style=filled, fillcolor=grey, label="6"];
+"@4"->"@6"; "@5"->"@6"; 
+"@7"[shape=doublecircle, style=filled, fillcolor=grey, label="7"];
+
+"@8"[shape=ellipse, style=filled, fillcolor=grey, label="8"];
+"@3"->"@8"; "@7"->"@8"; 
+"@9"[shape=doublecircle, style=filled, fillcolor=grey, label="9"];
+
+"@10"[shape=ellipse, style=filled, fillcolor=grey, label="10"];
+"@9"->"@10"; "@0"->"@10"; 
+"@11"[shape=ellipse, style=filled, fillcolor=grey, label="11"];
+"@0"->"@11"; "@1"->"@11"; 
+"@12"[shape=doublecircle, style=filled, fillcolor=grey, label="12"];
+
+"@13"[shape=ellipse, style=filled, fillcolor=grey, label="13"];
+"@2"->"@13"; "@3"->"@13"; 
+"@14"[shape=invtriangle, style=filled, fillcolor=grey, label="14"];
+"@6"->"@14"; 
+"@15"[shape=doublecircle, style=filled, fillcolor=grey, label="15"];
+
+"@16"[shape=ellipse, style=filled, fillcolor=grey, label="16"];
+"@1"->"@16"; "@15"->"@16"; 
+"@17"[shape=invhouse, style=filled, fillcolor=grey, label="17"];
+"@11"->"@17"; "@13"->"@17"; 
+"@18"[shape=invtriangle, style=filled, fillcolor=grey, label="18"];
+"@11"->"@18"; 
+"@19"[shape=invtriangle, style=filled, fillcolor=grey, label="19"];
+"@13"->"@19"; 
+"@20"[shape=ellipse, style=filled, fillcolor=grey, label="20"];
+"@12"->"@20"; "@2"->"@20"; 
+}

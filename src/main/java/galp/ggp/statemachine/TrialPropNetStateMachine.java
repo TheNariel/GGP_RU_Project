@@ -1,5 +1,8 @@
 package galp.ggp.statemachine;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
@@ -18,17 +21,19 @@ import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
 import com.google.common.collect.ImmutableList;
 
+import is.ru.cadia.ggp.propnet.PropNetMove;
 import is.ru.cadia.ggp.propnet.structure.GGPBasePropNetStructureFactory;
 import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
 import is.ru.cadia.ggp.propnet.structure.PropNetStructureFactory;
 import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
+import is.ru.cadia.ggp.propnet.structure.components.StaticComponent;
 
 public class TrialPropNetStateMachine extends StateMachine {
 	BitSet state;
 	private MachineState initialState;
 	private ImmutableList<Role> roles;
 	PropNetStructure structure = null;
-	String gdlFileName = ".//src//main//java//galp//ggp//main//out.txt";
+	String gdlFileName = ".//src//main//java//galp//ggp//main//out.gv";
 
 	public TrialPropNetStateMachine() {
 
@@ -37,19 +42,31 @@ public class TrialPropNetStateMachine extends StateMachine {
 	@Override
 	public void initialize(List<Gdl> description) {
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
+
 		try {
-			structure = factory.create(description);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			structure = factory.create("realySmallGame", description);
+			// structure = factory.create("Game", description);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		structure.renderToFile(new File(gdlFileName));
 		state = new BitSet(structure.getNbComponents());
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = computeInitialState();
+		List<Move> legals = null;
+		try {
+			legals =getLegalMoves(initialState, new Role(null));
+		} catch (MoveDefinitionException e) {
+			e.printStackTrace();
+		}
 
-		//System.out.println(state.get(33));
-		// structure.renderToFile(new File(gdlFileName));
+		for (Move s : legals) {
+			System.out.println(s.toString());
+		}
+
 	}
 
 	private MachineState computeInitialState() {
@@ -77,32 +94,132 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public boolean isTerminal(MachineState state) {
-		// TODO Auto-generated method stub
+
 		return false;
 	}
 
 	@Override
 	public List<Role> getRoles() {
-		// TODO Auto-generated method stub
 		return roles;
 	}
 
 	@Override
 	public MachineState getInitialState() {
-		// TODO Auto-generated method stub
-		return null;
+		return initialState;
 	}
 
 	@Override
-	public List<Move> getLegalMoves(MachineState state, Role role) throws MoveDefinitionException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Move> getLegalMoves(MachineState s, Role role) throws MoveDefinitionException {
+		List<Move> ret = new ArrayList<Move>();
+		// PropNetMove[] moves =structure.getPossibleMoves(roles.indexOf(role));
+		PropNetMove[] moves = structure.getPossibleMoves(0);
+		for (int i = 0; i < moves.length; i++) {
+
+		//	System.out.println(moves[i].toString());
+			// System.out.println(moves[0].getLegalComponent());
+			boolean legal = checkLegality(state, moves[0].getLegalComponent());
+		//	System.out.println(legal);
+			if (legal) {
+				ret.add(Move.create(moves[i].toString()));
+			}
+
+		}
+		return ret;
 	}
 
 	@Override
 	public MachineState getNextState(MachineState state, List<Move> moves) throws TransitionDefinitionException {
-		// TODO Auto-generated method stub
+
 		return null;
+	}
+
+	public boolean checkLegality(BitSet s, StaticComponent root) {
+		// System.out.println("starting to compute legality");
+		BitSet currentInternalState = (BitSet) s.clone();
+		BitSet seen = new BitSet();
+		List<Integer> front = new ArrayList<Integer>();
+		int[] inputs;
+		int nSeen = 0;
+		front.add(root.id);
+
+		while (!front.isEmpty()) {
+			StaticComponent current = structure.getComponent(front.get(0));
+			// System.out.println("current componenet " + current);
+			inputs = current.inputs;
+			for (int i : inputs) {
+				if (!seen.get(i)) {
+					front.add(0, i);
+				} else {
+					nSeen++;
+				}
+			}
+			if (nSeen == current.inputs.length) {
+				if (evaluate(current, currentInternalState)) {
+					currentInternalState.set(current.id);
+				}
+				seen.set(current.id);
+				front.remove(0);
+			}
+			nSeen = 0;
+
+		}
+		return currentInternalState.get(root.id);
+	}
+
+	public static enum Type {
+		INIT /* is true in the initial state only */, TRUE, FALSE, BASE /* true(X) */, INPUT /* does(R,M) */, AND, NOT, OR, PIPE /*
+																																	 * is
+																																	 * essentially
+																																	 * an
+																																	 * AND
+																																	 * (or
+																																	 * OR)
+																																	 * with
+																																	 * a
+																																	 * single
+																																	 * input
+																																	 */
+	}
+
+	public is.ru.cadia.ggp.propnet.structure.components.StaticComponent.Type type;
+
+	private boolean evaluate(StaticComponent current, BitSet currentInternalState) {
+		boolean ret = false;
+
+		this.type = current.type;
+		switch (type) {
+		case AND:
+			ret = true;
+			for (int i : current.inputs) {
+				ret = ret && currentInternalState.get(current.inputs[i]);
+			}
+			break;
+		case OR:
+			for (int i : current.inputs) {
+				ret = ret || currentInternalState.get(current.inputs[i]);
+			}
+			break;
+		case NOT:
+			ret = !currentInternalState.get(current.inputs[0]);
+			break;
+		case PIPE:
+			break;
+		case TRUE:
+			ret = true;
+			break;
+		case FALSE:
+			ret = false;
+			break;
+		case INPUT:
+			ret = currentInternalState.get(current.id);
+			break;
+		case BASE:
+			ret = currentInternalState.get(current.id);
+			break;
+		default:
+			break;
+		}
+		return ret;
 	}
 
 }

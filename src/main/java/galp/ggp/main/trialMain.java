@@ -9,6 +9,7 @@ import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
 import galp.ggp.statemachine.TrialPropNetStateMachine;
+import galp.ggp.statemachine.TrialProverStateMachine;
 import is.ru.cadia.ggp.utils.IOUtils;
 
 public class trialMain {
@@ -16,9 +17,9 @@ public class trialMain {
 	public static void main(String[] args) throws IOException, MoveDefinitionException, TransitionDefinitionException {
 		// setting up the state machine
 
-		String gdlFileName = ".//src//main//java//galp//ggp//main//game.txt";
+		//String gdlFileName = ".//src//main//java//galp//ggp//main//game.txt";
 
-		//String gdlFileName = ".//src//main//java//galp//ggp//main//realySmallGame.txt";
+		String gdlFileName = ".//src//main//java//galp//ggp//main//realySmallGame.txt";
 
 		String gameDescription = IOUtils.readFile(new File(gdlFileName));
 		String preprocessedRules = Game.preprocessRulesheet(gameDescription);
@@ -28,6 +29,14 @@ public class trialMain {
 		//StateMachine stateMachine = new TrialProverStateMachine(); // insert your own machine here
 
 		stateMachine.initialize(ggpBaseGame.getRules());
+
+		System.out.println("Prover part: ");
+
+		 stateMachine = new TrialProverStateMachine(); // insert your own machine here
+
+		stateMachine.initialize(ggpBaseGame.getRules());
+
+
 
 		// some testing
 		/*

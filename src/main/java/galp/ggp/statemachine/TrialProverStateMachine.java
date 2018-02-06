@@ -31,15 +31,23 @@ public class TrialProverStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
-System.out.println("test");
-        prover = new AimaProver(description);
+		List<Move> legals = null;
+		prover = new AimaProver(description);
 		roles = ImmutableList.copyOf(Role.computeRoles(description));
 		initialState = computeInitialState();
+		try {
+			 legals =	getLegalMoves(initialState,roles.get(0));
+		} catch (MoveDefinitionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		for (Move s : legals) {
+			System.out.println(s.toString());
+		}
 	}
 
 	private MachineState computeInitialState() {
-		System.out.println("test");
 		Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getInitQuery(), new HashSet<GdlSentence>());
 		for (GdlSentence s : results) {
 			System.out.print(s.toString());
@@ -73,8 +81,14 @@ System.out.println("test");
 
 	@Override
 	public List<Move> getLegalMoves(MachineState state, Role role) throws MoveDefinitionException {
-		// TODO Auto-generated method stub
-		return null;
+		 Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getLegalQuery(role), ProverQueryBuilder.getContext(state));
+
+	        if (results.isEmpty())
+	        {
+	            throw new MoveDefinitionException(state, role);
+	        }
+
+	        return new ProverResultParser().toMoves(results);
 	}
 
 	@Override

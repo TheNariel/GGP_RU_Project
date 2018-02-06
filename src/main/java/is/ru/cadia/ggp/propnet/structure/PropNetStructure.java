@@ -1,9 +1,5 @@
 package is.ru.cadia.ggp.propnet.structure;
 
-import is.ru.cadia.ggp.propnet.PropNetMove;
-import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
-import is.ru.cadia.ggp.propnet.structure.components.StaticComponent;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +18,10 @@ import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.logging.GamerLogger;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
+
+import is.ru.cadia.ggp.propnet.PropNetMove;
+import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
+import is.ru.cadia.ggp.propnet.structure.components.StaticComponent;
 
 /**
  * contains the structure of a propnet without a state in such a form that using a BitSet
