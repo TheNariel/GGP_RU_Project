@@ -105,6 +105,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 	public List<Move> getLegalMoves(MachineState state, Role role) throws MoveDefinitionException {
 		List<Move> ret = new ArrayList<Move>();
 		PropNetMove[] moves = structure.getPossibleMoves(roles.indexOf(role));
+
+		BitSetMachineState currentState = (BitSetMachineState) state;
+		currentState.seen.clear();
 		// PropNetMove[] moves = structure.getPossibleMoves(0);
 		for (int i = 0; i < moves.length; i++) {
 

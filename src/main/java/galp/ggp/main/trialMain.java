@@ -32,24 +32,24 @@ public class trialMain {
 		propNetStateMachine.initialize(ggpBaseGame.getRules());
 
 
-		StateMachine ProveeStateMachine = new TrialProverStateMachine(); // insert your own machine here
-		ProveeStateMachine.initialize(ggpBaseGame.getRules());
+		StateMachine proverStateMachine = new TrialProverStateMachine(); // insert your own machine here
+		proverStateMachine.initialize(ggpBaseGame.getRules());
 
 		// some testing
 
 		MachineState s0Prop = propNetStateMachine.getInitialState();
-		MachineState s0Reas = ProveeStateMachine.getInitialState();
+		MachineState s0Reas = proverStateMachine.getInitialState();
 
-		List<Move> aJointMove = ProveeStateMachine.getLegalJointMoves(s0Prop).get(0);
+		List<Move> aJointMove = propNetStateMachine.getLegalJointMoves(s0Prop).get(0);
 
 		MachineState s1Prop = propNetStateMachine.getNextState(s0Prop, aJointMove);
-		MachineState s1Reas = ProveeStateMachine.getNextState(s0Reas, aJointMove);
+		MachineState s1Reas = proverStateMachine.getNextState(s0Reas, aJointMove);
 
 
-		List<Move> aJointMove2 = ProveeStateMachine.getLegalJointMoves(s1Prop).get(0);
+		List<Move> aJointMove2 = propNetStateMachine.getLegalJointMoves(s1Prop).get(0);
 
 		MachineState s2Prop = propNetStateMachine.getNextState(s1Prop, aJointMove2);
-		MachineState s2Reas = ProveeStateMachine.getNextState(s1Reas, aJointMove2);
+		MachineState s2Reas = proverStateMachine.getNextState(s1Reas, aJointMove2);
 
 		System.out.println("Moves");
 		for (Move m : aJointMove) {
