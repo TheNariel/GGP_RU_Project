@@ -58,7 +58,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 		initialState = computeInitialState();
 		List<Move> legals = null;
 		try {
-			legals =getLegalMoves(initialState, new Role(null));
+			legals = getLegalMoves(initialState, new Role(null));
 		} catch (MoveDefinitionException e) {
 			e.printStackTrace();
 		}
@@ -115,10 +115,10 @@ public class TrialPropNetStateMachine extends StateMachine {
 		PropNetMove[] moves = structure.getPossibleMoves(0);
 		for (int i = 0; i < moves.length; i++) {
 
-		//	System.out.println(moves[i].toString());
+			// System.out.println(moves[i].toString());
 			// System.out.println(moves[0].getLegalComponent());
-			boolean legal = checkLegality(state, moves[0].getLegalComponent());
-		//	System.out.println(legal);
+			boolean legal = checkLegality(state, moves[i].getLegalComponent());
+			// System.out.println(legal);
 			if (legal) {
 				ret.add(Move.create(moves[i].toString()));
 			}
@@ -134,7 +134,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 	}
 
 	public boolean checkLegality(BitSet s, StaticComponent root) {
-		// System.out.println("starting to compute legality");
+		System.out.println("starting to compute legality");
 		BitSet currentInternalState = (BitSet) s.clone();
 		BitSet seen = new BitSet();
 		List<Integer> front = new ArrayList<Integer>();
@@ -144,7 +144,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		while (!front.isEmpty()) {
 			StaticComponent current = structure.getComponent(front.get(0));
-			// System.out.println("current componenet " + current);
+			System.out.println("current componenet " + current);
 			inputs = current.inputs;
 			for (int i : inputs) {
 				if (!seen.get(i)) {
@@ -191,18 +191,19 @@ public class TrialPropNetStateMachine extends StateMachine {
 		case AND:
 			ret = true;
 			for (int i : current.inputs) {
-				ret = ret && currentInternalState.get(current.inputs[i]);
+				ret = ret && currentInternalState.get(i);
 			}
 			break;
 		case OR:
 			for (int i : current.inputs) {
-				ret = ret || currentInternalState.get(current.inputs[i]);
+				ret = ret || currentInternalState.get(i);
 			}
 			break;
 		case NOT:
 			ret = !currentInternalState.get(current.inputs[0]);
 			break;
 		case PIPE:
+			ret = currentInternalState.get(current.id);
 			break;
 		case TRUE:
 			ret = true;
