@@ -28,6 +28,10 @@ public class TrialPropNetStateMachine extends StateMachine {
 	private BitSetMachineState initialState;
 	private ImmutableList<Role> roles;
 	PropNetStructure structure = null;
+	public PropNetStructure getStructure() {
+		return structure;
+	}
+
 	String gdlFileName = ".//src//main//java//galp//ggp//main//out.gv";
 
 	public TrialPropNetStateMachine() {
@@ -39,7 +43,8 @@ public class TrialPropNetStateMachine extends StateMachine {
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
 
 		try {
-			structure = factory.create("realySmallGame", description);
+			structure = factory.create("Game",description);
+			//structure = factory.create("realySmallGame", description);
 			// structure = factory.create("Game", description);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -50,23 +55,6 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = (BitSetMachineState) computeInitialState();
-		List<Move> legals = null;
-		try {
-			legals = getLegalMoves(initialState, roles.get(0));
-		} catch (MoveDefinitionException e) {
-			e.printStackTrace();
-		}
-
-		for (Move s : legals) {
-			System.out.println(s.toString());
-		}
-		try {
-			System.out.println(getGoal(initialState,roles.get(0)));
-		} catch (GoalDefinitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(isTerminal(initialState));
 	}
 
 	private MachineState computeInitialState() {
@@ -134,14 +122,32 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public MachineState getNextState(MachineState state, List<Move> moves) throws TransitionDefinitionException {
-		// set all seen false
-		return null;
+
+		int r =0;
+		BitSetMachineState currentState = (BitSetMachineState) state.clone();
+		//currentState.seen.clear();
+		for(Move m : moves) {
+			PropNetMove pnm = structure.getPropNetMove(roles.get(r), m);
+			r++;
+			currentState.state.set(pnm.getInputComponent().id);
+		}
+
+		BitSet nextState = new BitSet();
+		for (BaseProposition prop : structure.getBasePropositions()) {
+
+			if(checkLegality(currentState,  prop.nextComponent)) {
+				nextState.set(prop.id);
+			}
+
+		}
+		currentState.state=(BitSet) nextState.clone();
+		return currentState;
 	}
 
-	public boolean checkLegality(MachineState s, StaticComponent root) {
-		System.out.println("starting to compute legality");
+	public boolean checkLegality(MachineState state, StaticComponent root) {
+	//	System.out.println("starting to compute legality");
 
-		BitSetMachineState currentState = (BitSetMachineState) s;
+		BitSetMachineState currentState = (BitSetMachineState) state;
 
 		List<Integer> front = new ArrayList<Integer>();
 		int[] inputs;
@@ -150,7 +156,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		while (!front.isEmpty()) {
 			StaticComponent current = structure.getComponent(front.get(0));
-			System.out.println("current componenet " + current);
+		//	System.out.println("current componenet " + current);
 			inputs = current.inputs;
 			for (int i : inputs) {
 				if (!currentState.seen.get(i)) {

@@ -31,20 +31,10 @@ public class TrialProverStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
-		List<Move> legals = null;
 		prover = new AimaProver(description);
 		roles = ImmutableList.copyOf(Role.computeRoles(description));
 		initialState = computeInitialState();
-		try {
-			 legals =	getLegalMoves(initialState,roles.get(0));
-		} catch (MoveDefinitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		for (Move s : legals) {
-			System.out.println(s.toString());
-		}
 	}
 
 	private MachineState computeInitialState() {

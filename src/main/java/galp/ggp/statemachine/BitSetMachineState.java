@@ -36,7 +36,7 @@ public class BitSetMachineState extends MachineState {
 
 	@Override
 	public MachineState clone() {
-		return new BitSetMachineState(state,structure);
+		return new BitSetMachineState((BitSet)state.clone(),structure);
 	}
 
 }

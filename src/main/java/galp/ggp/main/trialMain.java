@@ -20,33 +20,56 @@ public class trialMain {
 	public static void main(String[] args) throws IOException, MoveDefinitionException, TransitionDefinitionException {
 		// setting up the state machine
 
-		// String gdlFileName = ".//src//main//java//galp//ggp//main//game.txt";
+		String gdlFileName = ".//src//main//java//galp//ggp//main//game.txt";
 
-		String gdlFileName = ".//src//main//java//galp//ggp//main//realySmallGame.txt";
+		//String gdlFileName = ".//src//main//java//galp//ggp//main//realySmallGame.txt";
 
 		String gameDescription = IOUtils.readFile(new File(gdlFileName));
 		String preprocessedRules = Game.preprocessRulesheet(gameDescription);
 		Game ggpBaseGame = Game.createEphemeralGame(preprocessedRules);
 
-		StateMachine stateMachine = new TrialPropNetStateMachine(); // insert your own machine here
-		// StateMachine stateMachine = new TrialProverStateMachine(); // insert your own
-		// machine here
+		StateMachine propNetStateMachine = new TrialPropNetStateMachine(); // insert your own machine here
+		propNetStateMachine.initialize(ggpBaseGame.getRules());
 
-		stateMachine.initialize(ggpBaseGame.getRules());
 
-		System.out.println("Prover part: ");
-
-		StateMachine stateMachineProver = new TrialProverStateMachine(); // insert your own machine here
-
-		stateMachineProver.initialize(ggpBaseGame.getRules());
+		StateMachine ProveeStateMachine = new TrialProverStateMachine(); // insert your own machine here
+		ProveeStateMachine.initialize(ggpBaseGame.getRules());
 
 		// some testing
 
-		MachineState s0 = stateMachineProver.getInitialState();
-		List<Move> aJointMove = stateMachineProver.getLegalJointMoves(s0).get(0);
-		MachineState s1 = stateMachineProver.getNextState(s0, aJointMove);
+		MachineState s0Prop = propNetStateMachine.getInitialState();
+		MachineState s0Reas = ProveeStateMachine.getInitialState();
 
-		System.out.println(s1);
+		List<Move> aJointMove = ProveeStateMachine.getLegalJointMoves(s0Prop).get(0);
+
+		MachineState s1Prop = propNetStateMachine.getNextState(s0Prop, aJointMove);
+		MachineState s1Reas = ProveeStateMachine.getNextState(s0Reas, aJointMove);
+
+
+		List<Move> aJointMove2 = ProveeStateMachine.getLegalJointMoves(s1Prop).get(0);
+
+		MachineState s2Prop = propNetStateMachine.getNextState(s1Prop, aJointMove2);
+		MachineState s2Reas = ProveeStateMachine.getNextState(s1Reas, aJointMove2);
+
+		System.out.println("Moves");
+		for (Move m : aJointMove) {
+			System.out.println(m);
+		}
+		System.out.println("Moves 2");
+		for (Move m : aJointMove2) {
+			System.out.println(m);
+		}
+
+		System.out.println("PropNet part: ");
+		System.out.println("s0 "+s0Prop);
+		System.out.println("s1 "+s1Prop);
+		System.out.println("s2 "+s2Prop);
+
+		System.out.println("Prover part: ");
+
+		System.out.println("s0 "+s0Reas);
+		System.out.println("s1 "+s1Reas);
+		System.out.println("s2 "+s2Reas);
 
 	}
 
