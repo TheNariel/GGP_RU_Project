@@ -4,16 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.ggp.base.util.gdl.grammar.Gdl;
-import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
-import org.ggp.base.util.statemachine.SimpleMachineState;
 import org.ggp.base.util.statemachine.StateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
@@ -29,8 +25,7 @@ import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
 import is.ru.cadia.ggp.propnet.structure.components.StaticComponent;
 
 public class TrialPropNetStateMachine extends StateMachine {
-	BitSet state;
-	private MachineState initialState;
+	private BitSetMachineState initialState;
 	private ImmutableList<Role> roles;
 	PropNetStructure structure = null;
 	String gdlFileName = ".//src//main//java//galp//ggp//main//out.gv";
@@ -52,10 +47,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 			e1.printStackTrace();
 		}
 		structure.renderToFile(new File(gdlFileName));
-		state = new BitSet(structure.getNbComponents());
 
 		roles = ImmutableList.copyOf(structure.getRoles());
-		initialState = computeInitialState();
+		initialState = (BitSetMachineState) computeInitialState();
 		List<Move> legals = null;
 		try {
 			legals = getLegalMoves(initialState, roles.get(0));
@@ -70,19 +64,16 @@ public class TrialPropNetStateMachine extends StateMachine {
 	}
 
 	private MachineState computeInitialState() {
-		Set<GdlSentence> contents = new HashSet<GdlSentence>();
+		BitSet state = new BitSet(structure.getNbComponents());
 
 		for (BaseProposition prop : structure.getBasePropositions()) {
 			if (prop.initialValue) {
 				state.set(prop.id);
-				GdlSentence[] sentences = prop.sentences;
-				for (int i = 0; i < sentences.length; i++) {
-					contents.add(sentences[i]);
-				}
+
 			}
 
 		}
-		SimpleMachineState ret = new SimpleMachineState(contents);
+		MachineState ret = new BitSetMachineState(state, structure);
 		return ret;
 	}
 
@@ -109,10 +100,10 @@ public class TrialPropNetStateMachine extends StateMachine {
 	}
 
 	@Override
-	public List<Move> getLegalMoves(MachineState s, Role role) throws MoveDefinitionException {
+	public List<Move> getLegalMoves(MachineState state, Role role) throws MoveDefinitionException {
 		List<Move> ret = new ArrayList<Move>();
-		PropNetMove[] moves =structure.getPossibleMoves(roles.indexOf(role));
-		//PropNetMove[] moves = structure.getPossibleMoves(0);
+		PropNetMove[] moves = structure.getPossibleMoves(roles.indexOf(role));
+		// PropNetMove[] moves = structure.getPossibleMoves(0);
 		for (int i = 0; i < moves.length; i++) {
 
 			// System.out.println(moves[i].toString());
@@ -129,14 +120,15 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public MachineState getNextState(MachineState state, List<Move> moves) throws TransitionDefinitionException {
-
+		// set all seen false
 		return null;
 	}
 
-	public boolean checkLegality(BitSet s, StaticComponent root) {
+	public boolean checkLegality(MachineState s, StaticComponent root) {
 		System.out.println("starting to compute legality");
-		BitSet currentInternalState = (BitSet) s.clone();
-		BitSet seen = new BitSet();
+
+		BitSetMachineState currentState = (BitSetMachineState) s;
+
 		List<Integer> front = new ArrayList<Integer>();
 		int[] inputs;
 		int nSeen = 0;
@@ -147,23 +139,23 @@ public class TrialPropNetStateMachine extends StateMachine {
 			System.out.println("current componenet " + current);
 			inputs = current.inputs;
 			for (int i : inputs) {
-				if (!seen.get(i)) {
+				if (!currentState.seen.get(i)) {
 					front.add(0, i);
 				} else {
 					nSeen++;
 				}
 			}
 			if (nSeen == current.inputs.length) {
-				if (evaluate(current, currentInternalState)) {
-					currentInternalState.set(current.id);
+				if (evaluate(current, currentState.state)) {
+					currentState.state.set(current.id);
 				}
-				seen.set(current.id);
+				currentState.seen.set(current.id);
 				front.remove(0);
 			}
 			nSeen = 0;
 
 		}
-		return currentInternalState.get(root.id);
+		return currentState.state.get(root.id);
 	}
 
 	public static enum Type {

@@ -396,4 +396,5 @@ public abstract class StateMachine
             avgScores[j] /= repetitions;
         }
     }
+
 }

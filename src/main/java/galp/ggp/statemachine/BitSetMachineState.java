@@ -8,11 +8,12 @@ import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.statemachine.MachineState;
 
 import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
+import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
 
 public class BitSetMachineState extends MachineState {
 	BitSet state;
 	PropNetStructure structure;
-
+	BitSet seen = new BitSet();
 	public BitSetMachineState(BitSet state,PropNetStructure structure) {
 		super();
 		this.state = state;
@@ -22,7 +23,14 @@ public class BitSetMachineState extends MachineState {
 	@Override
 	public Set<GdlSentence> getContents() {
 		Set<GdlSentence> contents = new HashSet<GdlSentence>();
-
+		int a = state.nextSetBit(0);
+		for(BaseProposition bp:structure.getBasePropositions()) {
+			if(state.get(bp.id)) {
+				for(GdlSentence s:bp.sentences) {
+					contents.add(s);
+				}
+			}
+		}
 		return contents;
 	}
 

@@ -49,9 +49,7 @@ public class TrialProverStateMachine extends StateMachine {
 
 	private MachineState computeInitialState() {
 		Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getInitQuery(), new HashSet<GdlSentence>());
-		for (GdlSentence s : results) {
-			System.out.print(s.toString());
-		}
+
 		return new ProverResultParser().toState(results);
 	}
 
@@ -69,14 +67,12 @@ public class TrialProverStateMachine extends StateMachine {
 
 	@Override
 	public List<Role> getRoles() {
-		// TODO Auto-generated method stub
-		return null;
+		return roles;
 	}
 
 	@Override
 	public MachineState getInitialState() {
-		// TODO Auto-generated method stub
-		return null;
+		return initialState;
 	}
 
 	@Override
@@ -93,8 +89,17 @@ public class TrialProverStateMachine extends StateMachine {
 
 	@Override
 	public MachineState getNextState(MachineState state, List<Move> moves) throws TransitionDefinitionException {
-		// TODO Auto-generated method stub
-		return null;
+		 Set<GdlSentence> results = prover.askAll(ProverQueryBuilder.getNextQuery(), ProverQueryBuilder.getContext(state, getRoles(), moves));
+
+	        for (GdlSentence sentence : results)
+	        {
+	            if (!sentence.isGround())
+	            {
+	                throw new TransitionDefinitionException(state, moves);
+	            }
+	        }
+
+	        return new ProverResultParser().toState(results);
 	}
 
 }
