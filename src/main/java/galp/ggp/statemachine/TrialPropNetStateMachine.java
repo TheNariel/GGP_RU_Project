@@ -58,7 +58,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 		initialState = computeInitialState();
 		List<Move> legals = null;
 		try {
-			legals = getLegalMoves(initialState, new Role(null));
+			legals = getLegalMoves(initialState, roles.get(0));
 		} catch (MoveDefinitionException e) {
 			e.printStackTrace();
 		}
@@ -111,8 +111,8 @@ public class TrialPropNetStateMachine extends StateMachine {
 	@Override
 	public List<Move> getLegalMoves(MachineState s, Role role) throws MoveDefinitionException {
 		List<Move> ret = new ArrayList<Move>();
-		// PropNetMove[] moves =structure.getPossibleMoves(roles.indexOf(role));
-		PropNetMove[] moves = structure.getPossibleMoves(0);
+		PropNetMove[] moves =structure.getPossibleMoves(roles.indexOf(role));
+		//PropNetMove[] moves = structure.getPossibleMoves(0);
 		for (int i = 0; i < moves.length; i++) {
 
 			// System.out.println(moves[i].toString());
