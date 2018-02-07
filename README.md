@@ -10,6 +10,7 @@ periment with some advanced topics, is split into several parts:
     main: usable main class for runing state machine wihout kiosk.
         
     gamer: package for gamer.
+        trialGamer.java : main implementation of random Legal Gamer. (choose this one in kiosk etc. )
         
     statemachine: implementation of propNet state machine. 
          
