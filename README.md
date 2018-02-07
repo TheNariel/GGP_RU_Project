@@ -26,3 +26,4 @@ periment with some advanced topics, is split into several parts:
 
 • project report / presentation
 
+The original can be found on git-hub: https://github.com/ggp-org/ggp-base
