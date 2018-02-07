@@ -1,7 +1,5 @@
 package galp.ggp.statemachine;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -40,18 +38,19 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
+		System.out.println("get init propnet");
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
 
 		try {
-			structure = factory.create("Game",description);
+			structure = factory.create(description);
 			//structure = factory.create("realySmallGame", description);
 			// structure = factory.create("Game", description);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
-		} catch (IOException e1) {
+		}/* catch (IOException e1) {
 			e1.printStackTrace();
-		}
-		structure.renderToFile(new File(gdlFileName));
+		}*/
+		//structure.renderToFile(new File(gdlFileName));
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = (BitSetMachineState) computeInitialState();
@@ -181,27 +180,12 @@ public class TrialPropNetStateMachine extends StateMachine {
 		return currentState.state.get(root.id);
 	}
 
-	public static enum Type {
-		INIT /* is true in the initial state only */, TRUE, FALSE, BASE /* true(X) */, INPUT /* does(R,M) */, AND, NOT, OR, PIPE /*
-																																	 * is
-																																	 * essentially
-																																	 * an
-																																	 * AND
-																																	 * (or
-																																	 * OR)
-																																	 * with
-																																	 * a
-																																	 * single
-																																	 * input
-																																	 */
-	}
-
-	public is.ru.cadia.ggp.propnet.structure.components.StaticComponent.Type type;
 
 	private boolean evaluate(StaticComponent current, BitSet currentInternalState) {
 		boolean ret = false;
 
-		this.type = current.type;
+		is.ru.cadia.ggp.propnet.structure.components.StaticComponent.Type type;
+		type = current.type;
 		switch (type) {
 		case AND:
 			ret = true;

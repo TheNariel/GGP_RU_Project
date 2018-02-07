@@ -7,7 +7,6 @@ import org.ggp.base.player.gamer.statemachine.StateMachineGamer;
 import org.ggp.base.util.game.Game;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.StateMachine;
-import org.ggp.base.util.statemachine.cache.CachedStateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
@@ -57,7 +56,9 @@ public class TrialSampleGamer extends StateMachineGamer {
 	// This is the default State Machine
 	@Override
 	public StateMachine getInitialStateMachine() {
-		return new CachedStateMachine(new TrialPropNetStateMachine());
+		System.out.println("get init machine");
+		return new TrialPropNetStateMachine();
+
 	}
 
 	// This is the defaul Sample Panel

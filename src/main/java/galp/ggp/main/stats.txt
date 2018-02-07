@@ -1,0 +1,28 @@
+GAME: 
+.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+propNet: 
+#game Steps: 14684 took :1.735s, average time per game step: 0.118155815 ms
+Prover: 
+#game Steps: 14720 took :4.852s, average time per game step: 0.32961956 ms
+
+GAME: 
+.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+propNet: 
+#game Steps: 14560 took :1.47s, average time per game step: 0.100961536 ms
+Prover: 
+#game Steps: 14630 took :4.484s, average time per game step: 0.30649352 ms
+
+GAME: 
+.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+propNet: 
+#game Steps: 14582 took :1.574s, average time per game step: 0.1079413 ms
+Prover: 
+#game Steps: 14664 took :4.912s, average time per game step: 0.33497 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+propNet: 
+#game Steps: 14640 took :1.453s, average time per game step: 0.09924863 ms
+Prover: 
+#game Steps: 14600 took :4.908s, average time per game step: 0.33616439 ms
+
