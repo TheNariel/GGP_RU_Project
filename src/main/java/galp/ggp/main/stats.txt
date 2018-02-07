@@ -1,28 +1,70 @@
-GAME: 
-.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//4pttc.gdl.txt
 propNet: 
-#game Steps: 14684 took :1.735s, average time per game step: 0.118155815 ms
+#game Steps: 31459 took :10.494s, average time per game step: 0.33357704 ms
 Prover: 
-#game Steps: 14720 took :4.852s, average time per game step: 0.32961956 ms
+#game Steps: 31471 took :21.926s, average time per game step: 0.6967049 ms
 
-GAME: 
-.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//8puzzle.gdl.txt
 propNet: 
-#game Steps: 14560 took :1.47s, average time per game step: 0.100961536 ms
+#game Steps: 60000 took :4.911s, average time per game step: 0.08185 ms
 Prover: 
-#game Steps: 14630 took :4.484s, average time per game step: 0.30649352 ms
-
-GAME: 
-.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
-propNet: 
-#game Steps: 14582 took :1.574s, average time per game step: 0.1079413 ms
-Prover: 
-#game Steps: 14664 took :4.912s, average time per game step: 0.33497 ms
+#game Steps: 60000 took :13.315s, average time per game step: 0.22191666 ms
 
 GAME: run 1000 times 
 .//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
 propNet: 
-#game Steps: 14640 took :1.453s, average time per game step: 0.09924863 ms
+#game Steps: 14496 took :1.569s, average time per game step: 0.10823675 ms
 Prover: 
-#game Steps: 14600 took :4.908s, average time per game step: 0.33616439 ms
+#game Steps: 14688 took :4.684s, average time per game step: 0.31889978 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//bidding-tictactoe_10coins.gdl.txt
+propNet: 
+#game Steps: 14856 took :3.163s, average time per game step: 0.21291061 ms
+Prover: 
+#game Steps: 14814 took :4.813s, average time per game step: 0.32489538 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//blocker.gdl.txt
+propNet: 
+#game Steps: 7988 took :0.942s, average time per game step: 0.11792689 ms
+Prover: 
+#game Steps: 7967 took :1.841s, average time per game step: 0.2310782 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//chickentictactoe.gdl.txt
+propNet: 
+#game Steps: 7105 took :0.629s, average time per game step: 0.08852921 ms
+Prover: 
+#game Steps: 7130 took :2.002s, average time per game step: 0.2807854 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//chinesecheckers3.gdl.txt
+propNet: 
+#game Steps: 54456 took :18.84s, average time per game step: 0.34596738 ms
+Prover: 
+#game Steps: 54201 took :32.307s, average time per game step: 0.5960591 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//chinesecheckers4.gdl.txt
+propNet: 
+#game Steps: 59000 took :51.911s, average time per game step: 0.87984747 ms
+Prover: 
+#game Steps: 57767 took :66.05s, average time per game step: 1.1433864 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//chinesecheckers6.gdl.txt
+propNet: 
+#game Steps: 58982 took :37.544s, average time per game step: 0.6365332 ms
+Prover: 
+#game Steps: 58979 took :48.394s, average time per game step: 0.82052934 ms
+
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//game.txt
+propNet: 
+#game Steps: 21806 took :2.017s, average time per game step: 0.092497475 ms
+Prover: 
+#game Steps: 21773 took :14.0s, average time per game step: 0.6429982 ms
 

@@ -37,13 +37,14 @@ public class trialMain {
 
 		Long starTime = System.currentTimeMillis();
 		int nGameSteps = 0;
-		int nOfGames =1000;
+		int nOfGames = 1000;
 		for (int i = 0; i < nOfGames; i++) {
 			nGameSteps += simulateGame(propNetStateMachine);
 		}
+		System.out.println();
 		Long endTime = System.currentTimeMillis();
 		String propnetStats = "#game Steps: " + nGameSteps + " took :" + (endTime - starTime) / 1000.0
-				+ "s, average time per game step: "+((float)(endTime - starTime))/nGameSteps+" ms";
+				+ "s, average time per game step: " + ((float) (endTime - starTime)) / nGameSteps + " ms";
 		System.out.println(propnetStats);
 
 		propNetStateMachine = new ProverStateMachine(); // insert your own machine here
@@ -55,15 +56,16 @@ public class trialMain {
 		for (int i = 0; i < nOfGames; i++) {
 			nGameSteps += simulateGame(propNetStateMachine);
 		}
+		System.out.println();
 		endTime = System.currentTimeMillis();
 		String proverStats = "#game Steps: " + nGameSteps + " took :" + (endTime - starTime) / 1000.0
-				+ "s, average time per game step: "+((float)(endTime - starTime))/nGameSteps+" ms";
+				+ "s, average time per game step: " + ((float) (endTime - starTime)) / nGameSteps + " ms";
 		System.out.println(proverStats);
 		String outputName = ".//src//main//java//galp//ggp//main//stats.txt";
 		try {
 			FileOutputStream fos = new FileOutputStream(new File(outputName), true);
 			OutputStreamWriter fout = new OutputStreamWriter(fos, "UTF-8");
-			fout.write("GAME: run "+nOfGames+" times \n");
+			fout.write("GAME: run " + nOfGames + " times \n");
 			fout.write(gdlFileName + "\n");
 			fout.write("propNet: \n");
 			fout.write(propnetStats + "\n");
@@ -99,6 +101,11 @@ public class trialMain {
 			// System.out.println("state after move " + state);
 			ret++;
 		}
+		/*try {
+			System.out.print(propNetStateMachine.getGoal(state, propNetStateMachine.getRoles().get(0)) + " ");
+		} catch (GoalDefinitionException e) {
+			e.printStackTrace();
+		}*/
 		// System.out.println("Game ended in terminal state");
 		return ret;
 	}
