@@ -14,6 +14,7 @@ periment with some advanced topics, is split into several parts:
    statemachine: implementation of propNet state machine. 
         
    some numerical results.
+   
          GGP_RU_Project/src/main/java/galp/ggp/main/stats.txt
 
 • solving simple games using search
