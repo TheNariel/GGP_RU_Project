@@ -30,5 +30,6 @@ The original can be found on git-hub: https://github.com/ggp-org/ggp-base
 
 Additional material that might be useful:
 
-Developer page for ggp-base with tutorials on how to set up your own player: http://www.ggp.org/developers/players.html (Links to an external site.)Links to an external site.
-Representation of GDL in the framework: http://www.ggp.org/developers/gdl.html (Links to an external site.)Links to an external site.
+Developer page for ggp-base with tutorials on how to set up your own player: http://www.ggp.org/developers/players.html 
+
+Representation of GDL in the framework: http://www.ggp.org/developers/gdl.html.
