@@ -32,8 +32,6 @@ public class TrialSampleGamer extends StateMachineGamer {
 	@Override
 	public void stateMachineStop() {
 		// TODO Auto-generated method stub
-
-
 	}
 
 	@Override
@@ -56,7 +54,6 @@ public class TrialSampleGamer extends StateMachineGamer {
 	// This is the default State Machine
 	@Override
 	public StateMachine getInitialStateMachine() {
-		System.out.println("get init machine");
 		return new TrialPropNetStateMachine();
 
 	}

@@ -68,3 +68,10 @@ propNet:
 Prover: 
 #game Steps: 21773 took :14.0s, average time per game step: 0.6429982 ms
 
+GAME: run 1000 times 
+.//src//main//java//galp//ggp//main//bidding-tictactoe.gdl.txt
+propNet: 
+#game Steps: 14478 took :1.849s, average time per game step: 0.12771101 ms
+Prover: 
+#game Steps: 14636 took :4.973s, average time per game step: 0.33977863 ms
+

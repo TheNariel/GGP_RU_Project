@@ -11,6 +11,8 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
+import galp.ggp.alphabeta.ABSearch;
+
 public class TrialGamer extends TrialSampleGamer {
 
 	@Override
@@ -24,6 +26,14 @@ public class TrialGamer extends TrialSampleGamer {
 		Move selection = moves.get(rng.nextInt(moves.size()));
 		return selection;
 	}
+
+	@Override
+	public void stateMachineMetaGame(long timeout)
+			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
+		ABSearch search = new ABSearch(getStateMachine());
+
+	}
+
 
 	@Override
 	public DetailPanel getDetailPanel() {
