@@ -36,10 +36,11 @@ public class TrialGamer extends TrialSampleGamer {
 		try {
 			for (int d = 1; d < 100; d++) {
 
-				miniMax((BitSetMachineState) getStateMachine().getInitialState(), d, timeout);
+				minMaxSearch((BitSetMachineState) getStateMachine().getInitialState(), d, timeout);
 
 			}
 		} catch (TimeOutException e) {
+
 		}
 
 	}
@@ -83,7 +84,7 @@ public class TrialGamer extends TrialSampleGamer {
 			}
 		}
 		if (d == 0)
-			return 40;
+			return 42;
 		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
@@ -100,12 +101,12 @@ public class TrialGamer extends TrialSampleGamer {
 	}
 
 	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout) throws TimeOutException {
-		int bestValue = Integer.MAX_VALUE;
+		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
-			for (List<Move> joinMove : getStateMachine().getLegalJointMoves(state, mine, move)) {
+			for (List<Move> jointMove : getStateMachine().getLegalJointMoves(state, mine, move)) {
 				value = 0
-						- miniMax((BitSetMachineState) getStateMachine().getNextState(state, joinMove), d - 1, timeout);
+						- miniMax((BitSetMachineState) getStateMachine().getNextState(state, jointMove), d - 1, timeout);
 				bestValue = Math.max(value, bestValue);
 			}
 		} catch (MoveDefinitionException | TransitionDefinitionException e) {
