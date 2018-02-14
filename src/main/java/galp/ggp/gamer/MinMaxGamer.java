@@ -34,11 +34,11 @@ public class MinMaxGamer extends SampleGamer {
 	    try {
 	        // This block configure the logger with handler and formatter
 	        smfh = new FileHandler("selectMove.log");
-	//        logger.addHandler(smfh);
+	        logger.addHandler(smfh);
 	        SimpleFormatter formatter = new SimpleFormatter();
 	        smfh.setFormatter(formatter);
 	        // the following statement is used to log any messages
-	  //      logger.info("My first log";
+	        logger.info("My first log";
 	    } catch (SecurityException e) {
 	        e.printStackTrace();
 	    } catch (IOException e) {
