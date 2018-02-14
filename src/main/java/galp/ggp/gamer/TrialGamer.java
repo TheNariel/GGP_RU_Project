@@ -70,7 +70,7 @@ public class TrialGamer extends TrialSampleGamer {
 		int value;
 		try {
 			for (Move move : getStateMachine().getLegalMoves(state, getRole())) {
-				value = 0 - minValue(state, getRole(), move, d, timeout);
+				value = 0 - minValue(state, getRole(), move, d, timeout, 0, -100);
 				if (value > bestValue) {
 					bestValue = value;
 					bestMove = move;
@@ -86,7 +86,7 @@ public class TrialGamer extends TrialSampleGamer {
 		return bestMove;
 	}
 
-	public int miniMax(BitSetMachineState state, int d, long timeout) throws TimeOutException {
+	public int miniMax(BitSetMachineState state, int d, long timeout, int alpha, int beta) throws TimeOutException {
 		if (System.currentTimeMillis() + 500 >= timeout)
 			throw new TimeOutException();
 		if (getStateMachine().isTerminal(state)) {
@@ -103,12 +103,12 @@ public class TrialGamer extends TrialSampleGamer {
 		int value;
 		try {
 			for (Move move : getStateMachine().getLegalMoves(state, getRole())) {
-				value = 0 - minValue(state, getRole(), move, d, timeout);
+				value = 0 - minValue(state, getRole(), move, d, timeout, -beta, -alpha);
 				bestValue = Math.max(value, bestValue);
-			/*	if(bestValue > alpha) {
+				if(bestValue > alpha) {
 					alpha = bestValue;
 					if(alpha >=beta)break;
-				}*/
+				}
 			}
 		} catch (MoveDefinitionException e) {
 			// TODO Auto-generated catch block
@@ -118,19 +118,19 @@ public class TrialGamer extends TrialSampleGamer {
 		return bestValue;
 	}
 
-	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout)
+	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout, int alpha, int beta)
 			throws TimeOutException {
 		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
 			for (List<Move> jointMove : getStateMachine().getLegalJointMoves(state, mine, move)) {
 				value = 0 - miniMax((BitSetMachineState) getStateMachine().getNextState(state, jointMove), d - 1,
-						timeout);
+						timeout, -beta, -alpha);
 				bestValue = Math.max(value, bestValue);
-				/*if(bestValue > alpha) {
+				if(bestValue > alpha) {
 					alpha = bestValue;
 					if(alpha >=beta)break;
-				}*/
+				}
 			}
 		} catch (MoveDefinitionException | TransitionDefinitionException e) {
 			// TODO Auto-generated catch block
