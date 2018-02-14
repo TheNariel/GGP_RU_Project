@@ -17,8 +17,9 @@ import galp.ggp.statemachine.TimeOutException;
 
 public class TrialGamer extends TrialSampleGamer {
 	private boolean bottomed;
-	int nStates;
+	int nStates,transFound;
 
+	Hashtable<BitSet, Transposition> trans_table ;
 	@Override
 	public Move stateMachineSelectMove(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
@@ -30,29 +31,42 @@ public class TrialGamer extends TrialSampleGamer {
 		 */
 		nStates = 0;
 		Move bestMove = null;
+		Long startTime = System.currentTimeMillis();
+
 		System.out.println("starting the search at depth 1");
 		try {
+
 			for (int d = 1; d < 100; d++) {
 				nStates = 0;
+				transFound = 0;
 				bottomed = false;
 				System.out.println("search at depth " + d);
+
+				Long startLoopTime = System.currentTimeMillis();
 				bestMove = minMaxSearch((BitSetMachineState) getCurrentState(), d, timeout);
-				//bestMove = minMaxSearchNoAB((BitSetMachineState) getCurrentState(), d, timeout);
-				System.out.println(nStates);
+				// bestMove = minMaxSearchNoAB((BitSetMachineState) getCurrentState(), d,
+				// timeout);
+				Long endLoopTime = System.currentTimeMillis();
+				System.out.println(
+						"Depth searched done in: " + (endLoopTime - startLoopTime) + " ms and " + nStates + " nodes and "+transFound+" transpositions found "+trans_table.size());
 				if (!bottomed)
 					break;
 			}
-		} catch (TimeOutException e) {
-			System.out.println("timeout exception");
-		}
-		System.out.println(bestMove.toString());
 
+		} catch (TimeOutException e) {
+			System.out.println("no more time, Get out, out, out .... ");
+		}
+		Long endTime = System.currentTimeMillis();
+		System.out.println("Search done in: " + (endTime - startTime) + " ms(time left " + (timeout - endTime)
+				+ " ms) with best move: " + bestMove.toString());
 		return bestMove;
 	}
 
 	@Override
 	public void stateMachineMetaGame(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
+		trans_table = new Hashtable<BitSet, Transposition>();
+
 		// ABSearch search = new ABSearch(getStateMachine(), getRole());
 		/*
 		 * Move bestMove = null; System.out.println("starting the search at depth 1");
@@ -70,7 +84,7 @@ public class TrialGamer extends TrialSampleGamer {
 	public DetailPanel getDetailPanel() {
 		return new EmptyDetailPanel();
 	}
-	Hashtable<BitSet, Transposition> trans_table = new Hashtable<BitSet, Transposition>();
+
 
 	public Move minMaxSearch(BitSetMachineState state, int d, long timeout) throws TimeOutException {
 		Move bestMove = null;
@@ -96,6 +110,7 @@ public class TrialGamer extends TrialSampleGamer {
 
 	public int miniMax(BitSetMachineState state, int d, long timeout, int alpha, int beta) throws TimeOutException {
 		nStates++;
+		int alphaOrig = alpha;
 		if (System.currentTimeMillis() + 500 >= timeout)
 			throw new TimeOutException();
 		if (getStateMachine().isTerminal(state)) {
@@ -110,26 +125,52 @@ public class TrialGamer extends TrialSampleGamer {
 			bottomed = true;
 			return 42;
 		}
-		if(trans_table.containsKey(state)) {//do something}
-
+		if (trans_table.containsKey(state.state)) {// do something}
+			transFound++;
+			Transposition trans = trans_table.get(state.state);
+			if (trans.d >= d) {
+				if (trans.type.equals("EXACT")) {
+					return trans.bestValue;
+				}
+				if (trans.type.equals("LOWERBOUND")) {
+					alpha = Math.max(alpha, trans.bestValue);
+				}
+				if (trans.type.equals("UPPERBOUND")) {
+					beta = Math.min(beta, trans.bestValue);
+				}
+				if (alpha >= beta)
+					return trans.bestValue;
+			}
 		}
 		int bestValue = Integer.MIN_VALUE;
 		int value;
-		Move bmove;
+		Move bmove = null;
 		try {
 			for (Move move : getStateMachine().getLegalMoves(state, getRole())) {
 				value = 0 - minValue(state, getRole(), move, d, timeout, -beta, -alpha);
-				if(value>bestValue) {bmove = move;}
+				if (value > bestValue) {
+					bmove = move;
+				}
 				bestValue = Math.max(value, bestValue);
 				if (bestValue > alpha) {
 					alpha = bestValue;
 					if (alpha >= beta)
 						break;
 				}
-			} //store the state in the transposition table here
-			Transposition trans = new Transposition(bestValue,d,"later", bmove);
-			BitSet bstate = state.getSet();
-			trans_table.put(bstate, trans);
+			} // store the state in the transposition table here
+			String type = "";
+			if (bestValue <= alphaOrig) {
+				type = "UPPERBOUND";
+			} else {
+				if (bestValue >= beta) {
+					type = "LOWERBOUND";
+				} else {
+					type = "EXACT";
+				}
+			}
+			Transposition trans = new Transposition(bestValue, d, type, bmove);
+			BitSet bstate = state.state;
+ 			trans_table.put(bstate, trans);
 		} catch (MoveDefinitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,10 +182,7 @@ public class TrialGamer extends TrialSampleGamer {
 	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout, int alpha, int beta)
 
 			throws TimeOutException {
-		//check whether the state is in the hashtable here
-		if(trans_table.containsKey(state)) {//do something}
 
-		}
 		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
@@ -157,13 +195,14 @@ public class TrialGamer extends TrialSampleGamer {
 					if (alpha >= beta)
 						break;
 				}
-			}//store the state in the transposition table here
+			}
 		} catch (MoveDefinitionException | TransitionDefinitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return bestValue;
 	}
+
 	public Move minMaxSearchNoAB(BitSetMachineState state, int d, long timeout) throws TimeOutException {
 		Move bestMove = null;
 
@@ -219,8 +258,6 @@ public class TrialGamer extends TrialSampleGamer {
 		return bestValue;
 	}
 
-
-
 	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout)
 
 			throws TimeOutException {
@@ -239,6 +276,5 @@ public class TrialGamer extends TrialSampleGamer {
 		}
 		return bestValue;
 	}
-
 
 }

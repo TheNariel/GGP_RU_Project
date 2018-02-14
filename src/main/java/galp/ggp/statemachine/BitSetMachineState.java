@@ -11,7 +11,7 @@ import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
 import is.ru.cadia.ggp.propnet.structure.components.BaseProposition;
 
 public class BitSetMachineState extends MachineState {
-	BitSet state;
+	public BitSet state;
 	PropNetStructure structure;
 	BitSet seen = new BitSet();
 	public BitSetMachineState(BitSet state,PropNetStructure structure) {

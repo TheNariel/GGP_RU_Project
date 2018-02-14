@@ -151,14 +151,16 @@ public final class GamePlayer extends Thread implements Subject
     // so that the GamePlayer class doesn't have to import RandomGamer.
     public static void main(String[] args)
     {
-        if (args.length != 1) {
+       /* if (args.length != 1) {
             System.err.println("Usage: GamePlayer <port>");
             System.exit(1);
-        }
+        }*/
 
         try {
-            GamePlayer player = new GamePlayer(Integer.valueOf(args[0]), new RandomGamer());
+           //GamePlayer player = new GamePlayer(Integer.valueOf(args[0]), new TrialGamer());
+            GamePlayer player = new GamePlayer(9148, new RandomGamer());
             player.run();
+           System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {
             System.err.println("Illegal port number: " + args[0]);
             e.printStackTrace();
