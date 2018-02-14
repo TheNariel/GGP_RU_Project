@@ -1,13 +1,11 @@
 package galp.ggp.gamer;
 
 import java.util.List;
-import java.util.Random;
 
 import org.ggp.base.apps.player.detail.DetailPanel;
 import org.ggp.base.apps.player.detail.EmptyDetailPanel;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
-import org.ggp.base.util.statemachine.StateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
@@ -20,28 +18,42 @@ public class TrialGamer extends TrialSampleGamer {
 	@Override
 	public Move stateMachineSelectMove(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
+		/*
+		 * Random rng = new Random(); StateMachine theMachine = getStateMachine();
+		 * List<Move> moves = theMachine.getLegalMoves(getCurrentState(), getRole());
+		 *
+		 * Move bestMove = moves.get(rng.nextInt(moves.size()));
+		 */
+		Move bestMove = null;
+		System.out.println("starting the search at depth 1");
+		try {
+			for (int d = 1; d < 10; d++) {
+				System.out.println("search at depth " + d);
+				bestMove = minMaxSearch((BitSetMachineState) getCurrentState(), d,
+						timeout);
 
-		Random rng = new Random();
-		StateMachine theMachine = getStateMachine();
-		List<Move> moves = theMachine.getLegalMoves(getCurrentState(), getRole());
+			}
+		} catch (TimeOutException e) {
+			System.out.println("timeout exception");
+		}
+		System.out.println(bestMove.toString());
 
-		Move selection = moves.get(rng.nextInt(moves.size()));
-		return selection;
+		return bestMove;
 	}
 
 	@Override
 	public void stateMachineMetaGame(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 		// ABSearch search = new ABSearch(getStateMachine(), getRole());
-		try {
-			for (int d = 1; d < 100; d++) {
-
-				minMaxSearch((BitSetMachineState) getStateMachine().getInitialState(), d, timeout);
-
-			}
-		} catch (TimeOutException e) {
-
-		}
+		/*
+		 * Move bestMove = null; System.out.println("starting the search at depth 1");
+		 * try { for (int d = 1; d < 20; d++) { System.out.println("search at depth " +
+		 * d); bestMove = minMaxSearch((BitSetMachineState)
+		 * getStateMachine().getInitialState(), d, timeout);
+		 *
+		 * } } catch (TimeOutException e) { System.out.println("timeout exception"); }
+		 * System.out.println(bestMove.toString());
+		 */
 
 	}
 
@@ -50,7 +62,8 @@ public class TrialGamer extends TrialSampleGamer {
 		return new EmptyDetailPanel();
 	}
 
-	public Move minMaxSearch(BitSetMachineState state, int d, long timeout) throws TimeOutException {
+	public Move minMaxSearch(BitSetMachineState state, int d, long timeout)
+			throws TimeOutException {
 		Move bestMove = null;
 
 		int bestValue = Integer.MIN_VALUE;
@@ -62,6 +75,7 @@ public class TrialGamer extends TrialSampleGamer {
 					bestValue = value;
 					bestMove = move;
 				}
+
 
 			}
 		} catch (MoveDefinitionException e) {
@@ -91,6 +105,10 @@ public class TrialGamer extends TrialSampleGamer {
 			for (Move move : getStateMachine().getLegalMoves(state, getRole())) {
 				value = 0 - minValue(state, getRole(), move, d, timeout);
 				bestValue = Math.max(value, bestValue);
+			/*	if(bestValue > alpha) {
+					alpha = bestValue;
+					if(alpha >=beta)break;
+				}*/
 			}
 		} catch (MoveDefinitionException e) {
 			// TODO Auto-generated catch block
@@ -100,14 +118,19 @@ public class TrialGamer extends TrialSampleGamer {
 		return bestValue;
 	}
 
-	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout) throws TimeOutException {
+	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout)
+			throws TimeOutException {
 		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
 			for (List<Move> jointMove : getStateMachine().getLegalJointMoves(state, mine, move)) {
-				value = 0
-						- miniMax((BitSetMachineState) getStateMachine().getNextState(state, jointMove), d - 1, timeout);
+				value = 0 - miniMax((BitSetMachineState) getStateMachine().getNextState(state, jointMove), d - 1,
+						timeout);
 				bestValue = Math.max(value, bestValue);
+				/*if(bestValue > alpha) {
+					alpha = bestValue;
+					if(alpha >=beta)break;
+				}*/
 			}
 		} catch (MoveDefinitionException | TransitionDefinitionException e) {
 			// TODO Auto-generated catch block

@@ -43,14 +43,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		try {
 			structure = factory.create(description);
-			//structure = factory.create("realySmallGame", description);
-			// structure = factory.create("Game", description);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
-		}/* catch (IOException e1) {
-			e1.printStackTrace();
-		}*/
-		//structure.renderToFile(new File(gdlFileName));
+		}
 
 		roles = ImmutableList.copyOf(structure.getRoles());
 		initialState = (BitSetMachineState) computeInitialState();
@@ -107,13 +102,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		BitSetMachineState currentState = (BitSetMachineState) state;
 		currentState.seen.clear();
-		// PropNetMove[] moves = structure.getPossibleMoves(0);
 		for (int i = 0; i < moves.length; i++) {
 
-			// System.out.println(moves[i].toString());
-			// System.out.println(moves[0].getLegalComponent());
 			boolean legal = checkLegality(state, moves[i].getLegalComponent());
-			// System.out.println(legal);
 			if (legal) {
 				ret.add(Move.create(moves[i].toString()));
 			}
@@ -127,7 +118,6 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		int r =0;
 		BitSetMachineState currentState = (BitSetMachineState) state.clone();
-		//currentState.seen.clear();
 		for(Move m : moves) {
 			PropNetMove pnm = structure.getPropNetMove(roles.get(r), m);
 			r++;
@@ -147,7 +137,6 @@ public class TrialPropNetStateMachine extends StateMachine {
 	}
 
 	public boolean checkLegality(MachineState state, StaticComponent root) {
-	//	System.out.println("starting to compute legality");
 
 		BitSetMachineState currentState = (BitSetMachineState) state;
 
@@ -158,7 +147,6 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 		while (!front.isEmpty()) {
 			StaticComponent current = structure.getComponent(front.get(0));
-		//	System.out.println("current componenet " + current);
 			inputs = current.inputs;
 			for (int i : inputs) {
 				if (!currentState.seen.get(i)) {
