@@ -1,5 +1,7 @@
 package galp.ggp.gamer;
 
+import java.util.BitSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.ggp.base.apps.player.detail.DetailPanel;
@@ -68,6 +70,7 @@ public class TrialGamer extends TrialSampleGamer {
 	public DetailPanel getDetailPanel() {
 		return new EmptyDetailPanel();
 	}
+	Hashtable<BitSet, Transposition> trans_table = new Hashtable<BitSet, Transposition>();
 
 	public Move minMaxSearch(BitSetMachineState state, int d, long timeout) throws TimeOutException {
 		Move bestMove = null;
@@ -107,19 +110,26 @@ public class TrialGamer extends TrialSampleGamer {
 			bottomed = true;
 			return 42;
 		}
+		if(trans_table.containsKey(state)) {//do something}
 
+		}
 		int bestValue = Integer.MIN_VALUE;
 		int value;
+		Move bmove;
 		try {
 			for (Move move : getStateMachine().getLegalMoves(state, getRole())) {
 				value = 0 - minValue(state, getRole(), move, d, timeout, -beta, -alpha);
+				if(value>bestValue) {bmove = move;}
 				bestValue = Math.max(value, bestValue);
 				if (bestValue > alpha) {
 					alpha = bestValue;
 					if (alpha >= beta)
 						break;
 				}
-			}
+			} //store the state in the transposition table here
+			Transposition trans = new Transposition(bestValue,d,"later", bmove);
+			BitSet bstate = state.getSet();
+			trans_table.put(bstate, trans);
 		} catch (MoveDefinitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,6 +141,10 @@ public class TrialGamer extends TrialSampleGamer {
 	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout, int alpha, int beta)
 
 			throws TimeOutException {
+		//check whether the state is in the hashtable here
+		if(trans_table.containsKey(state)) {//do something}
+
+		}
 		int bestValue = Integer.MIN_VALUE;
 		int value;
 		try {
@@ -143,7 +157,7 @@ public class TrialGamer extends TrialSampleGamer {
 					if (alpha >= beta)
 						break;
 				}
-			}
+			}//store the state in the transposition table here
 		} catch (MoveDefinitionException | TransitionDefinitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -204,6 +218,8 @@ public class TrialGamer extends TrialSampleGamer {
 
 		return bestValue;
 	}
+
+
 
 	private int minValue(BitSetMachineState state, Role mine, Move move, int d, long timeout)
 
