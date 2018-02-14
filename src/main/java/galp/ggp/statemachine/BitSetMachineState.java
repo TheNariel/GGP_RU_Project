@@ -23,7 +23,6 @@ public class BitSetMachineState extends MachineState {
 	@Override
 	public Set<GdlSentence> getContents() {
 		Set<GdlSentence> contents = new HashSet<GdlSentence>();
-		int a = state.nextSetBit(0);
 		for(BaseProposition bp:structure.getBasePropositions()) {
 			if(state.get(bp.id)) {
 				for(GdlSentence s:bp.sentences) {
