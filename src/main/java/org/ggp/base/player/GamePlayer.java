@@ -10,7 +10,6 @@ import org.ggp.base.player.event.PlayerDroppedPacketEvent;
 import org.ggp.base.player.event.PlayerReceivedMessageEvent;
 import org.ggp.base.player.event.PlayerSentMessageEvent;
 import org.ggp.base.player.gamer.Gamer;
-import org.ggp.base.player.gamer.statemachine.random.RandomGamer;
 import org.ggp.base.player.request.factory.RequestFactory;
 import org.ggp.base.player.request.grammar.Request;
 import org.ggp.base.util.http.HttpReader;
@@ -19,6 +18,8 @@ import org.ggp.base.util.logging.GamerLogger;
 import org.ggp.base.util.observer.Event;
 import org.ggp.base.util.observer.Observer;
 import org.ggp.base.util.observer.Subject;
+
+import galp.ggp.gamer.ABTTGamer;
 
 
 public final class GamePlayer extends Thread implements Subject
@@ -158,7 +159,7 @@ public final class GamePlayer extends Thread implements Subject
 
         try {
            //GamePlayer player = new GamePlayer(Integer.valueOf(args[0]), new TrialGamer());
-            GamePlayer player = new GamePlayer(9148, new RandomGamer());
+            GamePlayer player = new GamePlayer(9147, new ABTTGamer());
             player.run();
            System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {
