@@ -62,35 +62,8 @@ public class NegamaxGamer extends TrialSampleGamer {
 	@Override
 	public void stateMachineMetaGame(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-		nStates = 0;
-		Move bestMove = null;
-		Long startTime = System.currentTimeMillis();
+
 		System.out.println("::::META GAME START::::");
-		System.out.println("starting the search at depth 1");
-		try {
-			// todo WHILE LOOP
-			for (int d = 1; d < 100; d++) {
-				nStates = 0;
-				bottomed = false;
-				System.out.println("search at depth " + d);
-
-				Long startLoopTime = System.currentTimeMillis();
-				bestMove = minMaxSearch((BitSetMachineState) getCurrentState(), d, timeout);
-				// bestMove = minMaxSearchNoAB((BitSetMachineState) getCurrentState(), d,
-				// timeout);
-				Long endLoopTime = System.currentTimeMillis();
-				System.out.println("Depth searched done in: " + (endLoopTime - startLoopTime) + " ms and " + nStates
-						+ " nodes and");
-				if (!bottomed)
-					break;
-			}
-
-		} catch (TimeOutException e) {
-			System.out.println("no more time, Get out, out, out .... ");
-		}
-		Long endTime = System.currentTimeMillis();
-		System.out.println("Search done in: " + (endTime - startTime) + " ms(time left " + (timeout - endTime)
-				+ " ms) with best move: " + bestMove.toString());
 
 		System.out.println("::::META GAME END::::");
 	}

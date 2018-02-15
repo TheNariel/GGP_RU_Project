@@ -19,7 +19,7 @@ import org.ggp.base.util.observer.Event;
 import org.ggp.base.util.observer.Observer;
 import org.ggp.base.util.observer.Subject;
 
-import galp.ggp.gamer.ABTTGamer;
+import galp.ggp.gamer.NegamaxGamer;
 
 
 public final class GamePlayer extends Thread implements Subject
@@ -159,7 +159,11 @@ public final class GamePlayer extends Thread implements Subject
 
         try {
            //GamePlayer player = new GamePlayer(Integer.valueOf(args[0]), new TrialGamer());
-            GamePlayer player = new GamePlayer(9147, new ABTTGamer());
+          //  GamePlayer player = new GamePlayer(9147, new ABGamer());
+
+           // GamePlayer player = new GamePlayer(9148, new ABTTGamer());
+
+            GamePlayer player = new GamePlayer(9149, new NegamaxGamer());
             player.run();
            System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {
