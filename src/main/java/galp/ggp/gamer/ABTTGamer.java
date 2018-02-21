@@ -11,6 +11,7 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
+import galp.ggp.search.Transposition;
 import galp.ggp.statemachine.BitSetMachineState;
 import galp.ggp.statemachine.TimeOutException;
 

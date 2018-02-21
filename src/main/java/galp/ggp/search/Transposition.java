@@ -1,11 +1,12 @@
-package galp.ggp.gamer;
+package galp.ggp.search;
 
 import org.ggp.base.util.statemachine.Move;
 
 public class Transposition {
-	int bestValue,  d;
-	String type;
-	Move bmove;
+	public int bestValue;
+	public int d;
+	public String type;
+	public Move bmove;
 	public Transposition(int bestValue, int d, String string, Move bmove) {
 		this.bestValue=bestValue;
 		this.d=d;
