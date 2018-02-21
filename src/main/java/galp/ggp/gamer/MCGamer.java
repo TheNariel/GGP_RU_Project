@@ -15,6 +15,7 @@ import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
 import galp.ggp.search.Node;
 import galp.ggp.statemachine.BitSetMachineState;
+import galp.ggp.statemachine.TimeOutException;
 
 public class MCGamer extends TrialSampleGamer {
 	int nStates;
@@ -22,17 +23,28 @@ public class MCGamer extends TrialSampleGamer {
 	@Override
 	public Move stateMachineSelectMove(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-		/*
-		 * nStates = 0; Move bestMove = null; System.out.println("starting the search");
-		 * Long startTime = System.currentTimeMillis(); // bestMove =
-		 * mcSearch(getRole(), (BitSetMachineState) getCurrentState(), // timeout); Long
-		 * endTime = System.currentTimeMillis();
-		 *
-		 * System.out.println("Search done in: " + (endTime - startTime) +
-		 * " ms(time left " + (timeout - endTime) + " ms) with best move: " +
-		 * bestMove.toString() + " number of simulations: " + nStates); return bestMove;
-		 */
-		return null;
+		Node root = initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
+		nStates =0;
+		mcSearch(root, timeout);
+
+		Move bestMove = null;
+		for (int r = 0; r < getStateMachine().getRoles().size(); r++) {
+			if (getStateMachine().getRoles().get(r).equals(getRole())) {
+				int i=0;
+				int max = root.N[r][0];
+				for (int m = 1; m < root.N[r].length; m++) {
+					if (root.N[r][m] > max) {
+						max=root.N[r][m];
+						i=m;
+					}
+				}
+
+				bestMove = root.legalActions.get(r).get(i);
+
+			}
+		}
+		System.out.println(bestMove + " n of simulations: "+nStates);
+		return bestMove;
 	}
 
 	@Override
@@ -40,8 +52,27 @@ public class MCGamer extends TrialSampleGamer {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 
 		System.out.println("::::META GAME START::::");
-		Node root = initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null);
+		Node root = initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
+		nStates =0;
+		mcSearch(root, timeout);
 
+		Move bestMove = null;
+		for (int r = 0; r < getStateMachine().getRoles().size(); r++) {
+			if (getStateMachine().getRoles().get(r).equals(getRole())) {
+				int i=0;
+				int max = root.N[r][0];
+				for (int m = 1; m < root.N[r].length; m++) {
+					if (root.N[r][m] > max) {
+						max=root.N[r][m];
+						i=m;
+					}
+				}
+
+				bestMove = root.legalActions.get(r).get(i);
+
+			}
+		}
+		System.out.println(bestMove + " n of simulations: "+nStates);
 		System.out.println("::::META GAME END::::");
 	}
 
@@ -50,99 +81,138 @@ public class MCGamer extends TrialSampleGamer {
 		return new EmptyDetailPanel();
 	}
 
-	private Node initNextNode(BitSetMachineState state, Node parent) throws MoveDefinitionException {
+	private Node initNextNode(BitSetMachineState state, Node parent, List<Integer> moveFromParent)
+			throws MoveDefinitionException {
 
 		List<List<Move>> legalActions = new ArrayList<List<Move>>();
 		for (Role role : getStateMachine().getRoles()) {
 			legalActions.add(getStateMachine().getLegalMoves(state, role));
 		}
-		int[][] Q = new int[legalActions.size()][];
+		//System.out.println(legalActions);
+		double[][] Q = new double[legalActions.size()][];
 		int[][] N = new int[legalActions.size()][];
 		int i = 0;
 		for (List<Move> m : legalActions) {
-			Q[i] = new int[m.size()];
+			Q[i] = new double[m.size()];
 			N[i] = new int[m.size()];
 			i++;
 		}
 		Hashtable<String, Node> next = new Hashtable<String, Node>();
 
-		return new Node(state, parent, next, Q, N);
+		return new Node(state, parent, legalActions, next, Q, N, moveFromParent);
 	}
 
-	public Move mcSearchss(Role r, Node root, long timeout)
+	public void mcSearch(Node node, long timeout)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
-		List<Move> legalMoves;
-		BitSetMachineState nextState;
-		int score, index;
-		legalMoves = getStateMachine().getLegalMoves(root.state, r);
-
-		int[] Q = new int[legalMoves.size()];
-		int[] N = new int[legalMoves.size()];
+		List<Integer> indexes;
+		List<Move> moves;
+		String contents;
 
 		while (System.currentTimeMillis() + 100 <= timeout) {
-			nStates++;
-			List<Move> currMove = getStateMachine().getRandomJointMove(root.state);
-			Move action = currMove.get(getStateMachine().getRoles().indexOf(r));
-
-			nextState = (BitSetMachineState) getStateMachine().getNextState(root.state, currMove);
-			score = runSimulation(r, nextState);
-
-			index = legalMoves.indexOf(action);
-			Q[index] = (Q[index] * N[index] + score) / (N[index] + 1);
-			N[index] += 1;
-		}
-
-		int maxI = 0;
-		for (int i = 1; i < Q.length; i++) {
-			if (Q[i] > Q[maxI])
-				maxI = i;
-		}
-
-		System.out.println("no more time, Get out, out, out .... ");
-		return legalMoves.get(maxI);
-	}
-
-	public Move mcSearch(Role r, Node root, long timeout)
-			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
-
-		while (System.currentTimeMillis() + 100 <= timeout) {
-
-		}
-
-		System.out.println("no more time, Get out, out, out .... ");
-		return null;
-	}
-
-	public List<Integer> selection(Node root) {
-		int C =50;
-		Random rand = new Random();
-		List<List<Double>> pausible = new ArrayList<List<Double>>();
-
-		for (int r = 1; r < root.N.length; r++) {
-			List<Double> mo = new ArrayList<Double>();
-			for (int m = 1; m < root.N[r].length; m++) {
-				if (root.N[r][m] == 0) {
-					mo.add((double) Integer.MAX_VALUE);
-				}else {
-					mo.add(root.Q[r][m]+C*Math.sqrt(Math.log10(root.getNodeN())/root.N[r][m]));
+			// selection
+			while (true) {
+				moves = new ArrayList<Move>();
+				indexes = selection(node);
+				contents = "[";
+				for (int i = 0; i < indexes.size(); i++) {
+					Move m = node.legalActions.get(i).get(indexes.get(i));
+					contents += m.toString() + ", ";
+					moves.add(m);
+				}
+				contents = contents.substring(0, contents.length() - 2);
+				contents += "]";
+				if (node.next.contains(contents)) {
+					node = node.next.get(contents);
+				} else {
+					break;
 				}
 			}
 
+			// expand
+			BitSetMachineState nextstate = (BitSetMachineState) getStateMachine().getNextState(node.state, moves);
+			Node next = initNextNode((BitSetMachineState) nextstate, node, indexes);
+			node.next.put(contents, next);
+
+			// playout
+			List<Integer> value;
+			try {
+				value = runSimulation(next.state, timeout);
+			} catch (TimeOutException e) {
+				System.out.println("no more time, Get out, out, out .... ");
+				break;
+			}
+
+			// backprop
+			backProp(next, value);
 
 		}
 
-		return null;
 	}
 
-	public int runSimulation(Role r, BitSetMachineState state)
-			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
+	public List<Integer> selection(Node node) {
+		int C = 50;
+		Random rand = new Random();
+		List<List<Double>> A = new ArrayList<List<Double>>();
 
+		List<Integer> indexes = new ArrayList<Integer>();
+
+		for (int r = 0; r < node.N.length; r++) {
+			List<Double> mo = new ArrayList<Double>();
+			for (int m = 0; m < node.N[r].length; m++) {
+				if (node.N[r][m] == 0) {
+					mo.add((double) Integer.MAX_VALUE);
+				} else {
+					mo.add(node.Q[r][m] + C * Math.sqrt(Math.log10(node.getNodeN()) / node.N[r][m]));
+				}
+			}
+			A.add(mo);
+		}
+
+		for (int r = 0; r < A.size(); r++) {
+			double max = 0;
+			List<Integer> mo = new ArrayList<Integer>();
+			for (int m = 0; m < A.get(r).size(); m++) {
+				if (A.get(r).get(m) > max) {
+					mo.clear();
+					mo.add(m);
+					max = A.get(r).get(m);
+				} else {
+					if (A.get(r).get(m) == max) {
+						mo.add(m);
+					}
+				}
+			}
+			indexes.add(mo.get(rand.nextInt(mo.size())));
+		}
+
+		return indexes;
+	}
+
+	public void backProp(Node node, List<Integer> value) {
+		while (node.parent != null) {
+			for (int i = 0; i < node.moveFromParent.size(); i++) {
+				node.parent.Q[i][node.moveFromParent.get(i)] = node.Q[i][node.moveFromParent.get(i)]
+						+ ((value.get(i) - node.Q[i][node.moveFromParent.get(i)]) / (node.getNodeN() + 1));
+				node.parent.N[i][node.moveFromParent.get(i)] += 1;
+			}
+		}
+	}
+
+	public List<Integer> runSimulation(BitSetMachineState state, long timeout)
+			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
+		nStates++;
 		while (!getStateMachine().isTerminal(state)) {
+			if (System.currentTimeMillis() + 100 <= timeout)
+				throw new TimeOutException();
 			state = (BitSetMachineState) getStateMachine().getNextState(state,
 					getStateMachine().getRandomJointMove(state));
 		}
 
-		return getStateMachine().getGoal(state, r);
+		List<Integer> ret = new ArrayList<Integer>();
+		for (Role r : getStateMachine().getRoles()) {
+			ret.add(getStateMachine().getGoal(state, r));
+		}
+		return ret;
 
 	}
 

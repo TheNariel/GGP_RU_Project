@@ -30,49 +30,34 @@ public class trialMain {
 
 		StateMachine propNetStateMachine = new TrialPropNetStateMachine(); // insert your own machine here
 		propNetStateMachine.initialize(ggpBaseGame.getRules());
-
-		/*Long starTime = System.currentTimeMillis();
-		int nGameSteps = 0;
-		int nOfGames = 1000;
-		for (int i = 0; i < nOfGames; i++) {
-			nGameSteps += simulateGame(propNetStateMachine);
-		}
-		System.out.println();
-		Long endTime = System.currentTimeMillis();
-		String propnetStats = "#game Steps: " + nGameSteps + " took :" + (endTime - starTime) / 1000.0
-				+ "s, average time per game step: " + ((float) (endTime - starTime)) / nGameSteps + " ms";
-		System.out.println(propnetStats);
-
-		propNetStateMachine = new ProverStateMachine(); // insert your own machine here
-		propNetStateMachine.initialize(ggpBaseGame.getRules());
-
-		System.out.println("reasoner:");
-		starTime = System.currentTimeMillis();
-		nGameSteps = 0;
-		for (int i = 0; i < nOfGames; i++) {
-			nGameSteps += simulateGame(propNetStateMachine);
-		}
-		System.out.println();
-		endTime = System.currentTimeMillis();
-		String proverStats = "#game Steps: " + nGameSteps + " took :" + (endTime - starTime) / 1000.0
-				+ "s, average time per game step: " + ((float) (endTime - starTime)) / nGameSteps + " ms";
-		System.out.println(proverStats);
-		String outputName = ".//src//main//java//galp//ggp//main//stats.txt";
-		try {
-			FileOutputStream fos = new FileOutputStream(new File(outputName), true);
-			OutputStreamWriter fout = new OutputStreamWriter(fos, "UTF-8");
-			fout.write("GAME: run " + nOfGames + " times \n");
-			fout.write(gdlFileName + "\n");
-			fout.write("propNet: \n");
-			fout.write(propnetStats + "\n");
-			fout.write("Prover: \n");
-			fout.write(proverStats + "\n\n");
-			fout.close();
-			fos.close();
-		} catch (Exception e) {
-			GamerLogger.logStackTrace("StateMachine", e);
-		}*/
-
+		simulateGame(propNetStateMachine);
+		/*
+		 * Long starTime = System.currentTimeMillis(); int nGameSteps = 0; int nOfGames
+		 * = 1000; for (int i = 0; i < nOfGames; i++) { nGameSteps +=
+		 * simulateGame(propNetStateMachine); } System.out.println(); Long endTime =
+		 * System.currentTimeMillis(); String propnetStats = "#game Steps: " +
+		 * nGameSteps + " took :" + (endTime - starTime) / 1000.0 +
+		 * "s, average time per game step: " + ((float) (endTime - starTime)) /
+		 * nGameSteps + " ms"; System.out.println(propnetStats);
+		 *
+		 * propNetStateMachine = new ProverStateMachine(); // insert your own machine
+		 * here propNetStateMachine.initialize(ggpBaseGame.getRules());
+		 *
+		 * System.out.println("reasoner:"); starTime = System.currentTimeMillis();
+		 * nGameSteps = 0; for (int i = 0; i < nOfGames; i++) { nGameSteps +=
+		 * simulateGame(propNetStateMachine); } System.out.println(); endTime =
+		 * System.currentTimeMillis(); String proverStats = "#game Steps: " + nGameSteps
+		 * + " took :" + (endTime - starTime) / 1000.0 +
+		 * "s, average time per game step: " + ((float) (endTime - starTime)) /
+		 * nGameSteps + " ms"; System.out.println(proverStats); String outputName =
+		 * ".//src//main//java//galp//ggp//main//stats.txt"; try { FileOutputStream fos
+		 * = new FileOutputStream(new File(outputName), true); OutputStreamWriter fout =
+		 * new OutputStreamWriter(fos, "UTF-8"); fout.write("GAME: run " + nOfGames +
+		 * " times \n"); fout.write(gdlFileName + "\n"); fout.write("propNet: \n");
+		 * fout.write(propnetStats + "\n"); fout.write("Prover: \n");
+		 * fout.write(proverStats + "\n\n"); fout.close(); fos.close(); } catch
+		 * (Exception e) { GamerLogger.logStackTrace("StateMachine", e); }
+		 */
 
 	}
 
@@ -87,13 +72,12 @@ public class trialMain {
 
 			moves = propNetStateMachine.getLegalJointMoves(state);
 			move = moves.get(rng.nextInt(moves.size()));
-
+			System.out.println(move);
 			state = propNetStateMachine.getNextState(state, move);
 			ret++;
 		}
 
 		return ret;
 	}
-
 
 }

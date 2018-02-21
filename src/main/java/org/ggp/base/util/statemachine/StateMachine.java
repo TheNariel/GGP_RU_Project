@@ -233,7 +233,7 @@ public abstract class StateMachine
         return nextStates;
     }
 
-    protected void crossProductLegalMoves(List<List<Move>> legals, List<List<Move>> crossProduct, LinkedList<Move> partial)
+    public void crossProductLegalMoves(List<List<Move>> legals, List<List<Move>> crossProduct, LinkedList<Move> partial)
     {
         if (partial.size() == legals.size()) {
             crossProduct.add(new ArrayList<Move>(partial));
