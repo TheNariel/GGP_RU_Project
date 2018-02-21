@@ -29,11 +29,11 @@ public class Node {
 
 	public int getNodeN() {
 		int ret = 0;
-		for (int r = 1; r < N.length; r++) {
-			for (int m = 1; m < N[r].length; m++) {
+		for (int r = 0; r < N.length; r++) {
+			for (int m = 0; m < N[r].length; m++) {
 				ret += N[r][m];
 			}
 		}
-		return ret;
+		return ret/2;
 	}
 }

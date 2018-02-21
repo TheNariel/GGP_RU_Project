@@ -23,19 +23,23 @@ public class MCGamer extends TrialSampleGamer {
 	@Override
 	public Move stateMachineSelectMove(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-		Node root = initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
-		nStates =0;
+		// Geting the initial "root" node for the tree
+		Node root = initNextNode((BitSetMachineState) getCurrentState(), null, null);
+		nStates = 0;
+
+		// doing the search;
 		mcSearch(root, timeout);
 
+		// finding the move with bigest N
 		Move bestMove = null;
 		for (int r = 0; r < getStateMachine().getRoles().size(); r++) {
 			if (getStateMachine().getRoles().get(r).equals(getRole())) {
-				int i=0;
+				int i = 0;
 				int max = root.N[r][0];
 				for (int m = 1; m < root.N[r].length; m++) {
 					if (root.N[r][m] > max) {
-						max=root.N[r][m];
-						i=m;
+						max = root.N[r][m];
+						i = m;
 					}
 				}
 
@@ -43,7 +47,8 @@ public class MCGamer extends TrialSampleGamer {
 
 			}
 		}
-		System.out.println(bestMove + " n of simulations: "+nStates);
+		// returning the move.
+		System.out.println(bestMove + " n of simulations: " + nStates);
 		return bestMove;
 	}
 
@@ -52,27 +57,20 @@ public class MCGamer extends TrialSampleGamer {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 
 		System.out.println("::::META GAME START::::");
-		Node root = initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
-		nStates =0;
-		mcSearch(root, timeout);
-
-		Move bestMove = null;
-		for (int r = 0; r < getStateMachine().getRoles().size(); r++) {
-			if (getStateMachine().getRoles().get(r).equals(getRole())) {
-				int i=0;
-				int max = root.N[r][0];
-				for (int m = 1; m < root.N[r].length; m++) {
-					if (root.N[r][m] > max) {
-						max=root.N[r][m];
-						i=m;
-					}
-				}
-
-				bestMove = root.legalActions.get(r).get(i);
-
-			}
-		}
-		System.out.println(bestMove + " n of simulations: "+nStates);
+		/*
+		 * Node root = initNextNode((BitSetMachineState) getCurrentState(), null, null);
+		 * nStates =0; mcSearch(root, timeout);
+		 *
+		 * Move bestMove = null; for (int r = 0; r <
+		 * getStateMachine().getRoles().size(); r++) { if
+		 * (getStateMachine().getRoles().get(r).equals(getRole())) { int i=0; int max =
+		 * root.N[r][0]; for (int m = 1; m < root.N[r].length; m++) { if (root.N[r][m] >
+		 * max) { max=root.N[r][m]; i=m; } }
+		 *
+		 * bestMove = root.legalActions.get(r).get(i);
+		 *
+		 * } } System.out.println(bestMove + " n of simulations: "+nStates);
+		 */
 		System.out.println("::::META GAME END::::");
 	}
 
@@ -81,6 +79,13 @@ public class MCGamer extends TrialSampleGamer {
 		return new EmptyDetailPanel();
 	}
 
+	// this method make a new tree node from game state.
+	// Q and N are stored in two dimensional arrays where first index is the role
+	// the belong to and second is the action. they have the same size/dimension as
+	// the legalAction list of lists
+	// where are all the legal moves for all the roles.
+	// next is hash map, maping the string representation of joint move to a Node,
+	// representing state after that move.
 	private Node initNextNode(BitSetMachineState state, Node parent, List<Integer> moveFromParent)
 			throws MoveDefinitionException {
 
@@ -88,7 +93,7 @@ public class MCGamer extends TrialSampleGamer {
 		for (Role role : getStateMachine().getRoles()) {
 			legalActions.add(getStateMachine().getLegalMoves(state, role));
 		}
-		//System.out.println(legalActions);
+		// System.out.println(legalActions);
 		double[][] Q = new double[legalActions.size()][];
 		int[][] N = new int[legalActions.size()][];
 		int i = 0;
@@ -102,6 +107,7 @@ public class MCGamer extends TrialSampleGamer {
 		return new Node(state, parent, legalActions, next, Q, N, moveFromParent);
 	}
 
+	// Main method of the search, going throw all four stages.
 	public void mcSearch(Node node, long timeout)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		List<Integer> indexes;
@@ -109,7 +115,8 @@ public class MCGamer extends TrialSampleGamer {
 		String contents;
 
 		while (System.currentTimeMillis() + 100 <= timeout) {
-			// selection
+			// selection selection(node) chooses the best actions for all players and if we
+			// have corresponding state in tree its repeated there.
 			while (true) {
 				moves = new ArrayList<Move>();
 				indexes = selection(node);
@@ -149,25 +156,34 @@ public class MCGamer extends TrialSampleGamer {
 
 	}
 
+	// the UCT selection method.
 	public List<Integer> selection(Node node) {
 		int C = 50;
 		Random rand = new Random();
 		List<List<Double>> A = new ArrayList<List<Double>>();
 
 		List<Integer> indexes = new ArrayList<Integer>();
-
+		// getting the A values for all the actions for all the roles.
 		for (int r = 0; r < node.N.length; r++) {
 			List<Double> mo = new ArrayList<Double>();
 			for (int m = 0; m < node.N[r].length; m++) {
 				if (node.N[r][m] == 0) {
 					mo.add((double) Integer.MAX_VALUE);
 				} else {
-					mo.add(node.Q[r][m] + C * Math.sqrt(Math.log10(node.getNodeN()) / node.N[r][m]));
+					double h = node.Q[r][m];
+					double huu = node.N[r][m];
+					double huuu = node.getNodeN();
+					double hu = Math.log(huuu) / huu;
+					double hh = Math.sqrt(hu);
+
+					mo.add(h + C * hh);
 				}
 			}
 			A.add(mo);
 		}
 
+		// getting index of the biggest A. if there is multiple of them than pick random
+		// among the bigest.
 		for (int r = 0; r < A.size(); r++) {
 			double max = 0;
 			List<Integer> mo = new ArrayList<Integer>();
@@ -188,21 +204,27 @@ public class MCGamer extends TrialSampleGamer {
 		return indexes;
 	}
 
+	// back probation starting with newly expanded node and updating parent until
+	// there are no parents.
 	public void backProp(Node node, List<Integer> value) {
 		while (node.parent != null) {
 			for (int i = 0; i < node.moveFromParent.size(); i++) {
-				node.parent.Q[i][node.moveFromParent.get(i)] = node.Q[i][node.moveFromParent.get(i)]
-						+ ((value.get(i) - node.Q[i][node.moveFromParent.get(i)]) / (node.getNodeN() + 1));
+				node.parent.Q[i][node.moveFromParent.get(i)] = node.parent.Q[i][node.moveFromParent.get(i)]
+						+ ((value.get(i) - node.parent.Q[i][node.moveFromParent.get(i)])
+								/ (node.parent.getNodeN() + 1));
 				node.parent.N[i][node.moveFromParent.get(i)] += 1;
 			}
+			node = node.parent;
 		}
 	}
 
+	// simulating the random playuot of the game, returning values for all the
+	// roles.
 	public List<Integer> runSimulation(BitSetMachineState state, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
-		nStates++;
+
 		while (!getStateMachine().isTerminal(state)) {
-			if (System.currentTimeMillis() + 100 <= timeout)
+			if (System.currentTimeMillis() + 100 >= timeout)
 				throw new TimeOutException();
 			state = (BitSetMachineState) getStateMachine().getNextState(state,
 					getStateMachine().getRandomJointMove(state));
@@ -212,6 +234,7 @@ public class MCGamer extends TrialSampleGamer {
 		for (Role r : getStateMachine().getRoles()) {
 			ret.add(getStateMachine().getGoal(state, r));
 		}
+		nStates++;
 		return ret;
 
 	}
