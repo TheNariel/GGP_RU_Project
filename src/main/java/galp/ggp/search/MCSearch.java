@@ -84,7 +84,6 @@ public class MCSearch {
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		List<Integer> indexes;
 		List<Move> moves;
-		String contents;
 
 		while (System.currentTimeMillis() + 100 <= timeout) {
 			Node node = root;
@@ -101,8 +100,8 @@ public class MCSearch {
 				}
 				// contents = contents.substring(0, contents.length() - 2);
 				// contents += "]";
-				if (node.next.containsKey(indexes.toString())) {
-					node = node.next.get(indexes.toString());
+				if (node.exploredChildren.containsKey(indexes.toString())) {
+					node = node.exploredChildren.get(indexes.toString());
 					if (node.terminal)
 						break;
 				} else {
@@ -114,32 +113,34 @@ public class MCSearch {
 				backProp(node, node.values);
 			} else {
 
-			// expand
-			BitSetMachineState nextstate = (BitSetMachineState) propNetStateMachine.getNextState(node.state, moves);
-			Node next = initNextNode((BitSetMachineState) nextstate, node, indexes);
-			if (propNetStateMachine.isTerminal(next.state)) {
-				next.terminal = true;
-				List<Integer> ret = new ArrayList<Integer>();
-				for (Role r : propNetStateMachine.getRoles()) {
-					ret.add(propNetStateMachine.getGoal(next.state, r));
+				// expand
+				BitSetMachineState nextstate = (BitSetMachineState) propNetStateMachine.getNextState(node.state, moves);
+				Node next = initNextNode((BitSetMachineState) nextstate, node, indexes);
+				if (propNetStateMachine.isTerminal(next.state)) {
+					next.terminal = true;
+					List<Integer> ret = new ArrayList<Integer>();
+					for (Role r : propNetStateMachine.getRoles()) {
+						ret.add(propNetStateMachine.getGoal(next.state, r));
+					}
+					next.values = ret;
+
+					backProp(next, next.values);
+					node.exploredChildren.put(indexes.toString(), next);
+				} else {
+					node.exploredChildren.put(indexes.toString(), next);
+
+					// playout
+					List<Integer> value;
+					try {
+						value = runSimulation(next.state, timeout);
+					} catch (TimeOutException e) {
+						// System.out.println("no more time, Get out, out, out .... ");
+						break;
+					}
+
+					// backprop
+					backProp(next, value);
 				}
-				next.values = ret;
-
-				backProp(next, next.values);
-			}
-			node.next.put(indexes.toString(), next);
-
-			// playout
-			List<Integer> value;
-			try {
-				value = runSimulation(next.state, timeout);
-			} catch (TimeOutException e) {
-				// System.out.println("no more time, Get out, out, out .... ");
-				break;
-			}
-
-			// backprop
-			backProp(next, value);
 			}
 		}
 

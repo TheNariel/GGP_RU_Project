@@ -34,7 +34,7 @@ public class MCGamer extends TrialSampleGamer {
 			} //
 				// System.out.println(jointMove);
 
-			root = root.next.get(jointMove.toString());
+			root = root.exploredChildren.get(jointMove.toString());
 
 		} /*
 			 * else { root = search.initNextNode((BitSetMachineState) getCurrentState(),

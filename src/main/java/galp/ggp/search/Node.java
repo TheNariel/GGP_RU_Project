@@ -11,7 +11,7 @@ public class Node {
 	public double[][] Q;
 	public int[][] N;
 	public List<List<Move>> legalActions;
-	public Hashtable<String, Node> next = new Hashtable<String, Node>();
+	public Hashtable<String, Node> exploredChildren = new Hashtable<String, Node>();
 	public Node parent;
 	public BitSetMachineState state;
 	public List<Integer> moveFromParent;
@@ -23,7 +23,7 @@ public class Node {
 		super();
 		this.state = state;
 		this.parent = parent;
-		this.next = next;
+		this.exploredChildren = next;
 		Q = q;
 		N = n;
 		this.legalActions = legalActions;
