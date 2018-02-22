@@ -1,7 +1,11 @@
 package galp.ggp.gamer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ggp.base.apps.player.detail.DetailPanel;
 import org.ggp.base.apps.player.detail.EmptyDetailPanel;
+import org.ggp.base.util.gdl.grammar.GdlTerm;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
@@ -13,14 +17,31 @@ import galp.ggp.statemachine.BitSetMachineState;
 
 public class MCGamer extends TrialSampleGamer {
 	int nStates;
+	Node root;
+	MCSearch search;
 
 	@Override
 	public Move stateMachineSelectMove(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-		// Geting the initial "root" node for the tree
-		MCSearch search = new MCSearch(getStateMachine());
-		Node root = search.initNextNode((BitSetMachineState) getCurrentState(), null, null);
 
+		List<GdlTerm> lastMoves = getMatch().getMostRecentMoves();
+		if (lastMoves != null) {
+			List<Integer> jointMove = new ArrayList<Integer>();
+			int r = 0;
+			for (GdlTerm sentence : lastMoves) {
+				jointMove.add(root.legalActions.get(r).indexOf(getStateMachine().getMoveFromTerm(sentence)));
+				r++;
+			} //
+				// System.out.println(jointMove);
+
+			root = root.next.get(jointMove.toString());
+
+		} /*
+			 * else { root = search.initNextNode((BitSetMachineState) getCurrentState(),
+			 * null, null); }
+			 */
+		if (root == null)
+			root = search.initNextNode((BitSetMachineState) getCurrentState(), null, null);
 		return search.search(root, timeout, getRole());
 	}
 
@@ -29,20 +50,10 @@ public class MCGamer extends TrialSampleGamer {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 
 		System.out.println("::::META GAME START::::");
-		/*
-		 * Node root = initNextNode((BitSetMachineState) getCurrentState(), null, null);
-		 * nStates =0; mcSearch(root, timeout);
-		 *
-		 * Move bestMove = null; for (int r = 0; r <
-		 * getStateMachine().getRoles().size(); r++) { if
-		 * (getStateMachine().getRoles().get(r).equals(getRole())) { int i=0; int max =
-		 * root.N[r][0]; for (int m = 1; m < root.N[r].length; m++) { if (root.N[r][m] >
-		 * max) { max=root.N[r][m]; i=m; } }
-		 *
-		 * bestMove = root.legalActions.get(r).get(i);
-		 *
-		 * } } System.out.println(bestMove + " n of simulations: "+nStates);
-		 */
+		search = new MCSearch(getStateMachine());
+
+		root = search.initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
+		search.search(root, timeout, getRole());
 		System.out.println("::::META GAME END::::");
 	}
 
@@ -50,7 +61,5 @@ public class MCGamer extends TrialSampleGamer {
 	public DetailPanel getDetailPanel() {
 		return new EmptyDetailPanel();
 	}
-
-
 
 }

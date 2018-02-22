@@ -18,11 +18,13 @@ import galp.ggp.statemachine.TimeOutException;
 public class MCSearch {
 	StateMachine propNetStateMachine;
 	int nStates;
+
 	public MCSearch(StateMachine propNetStateMachine) {
 		this.propNetStateMachine = propNetStateMachine;
 	}
 
-	public Move search(Node root, long timeout,Role role) throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
+	public Move search(Node root, long timeout, Role role)
+			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		nStates = 0;
 		mcSearch(root, timeout);
 
@@ -44,10 +46,11 @@ public class MCSearch {
 			}
 		}
 
-//		System.out.println(bestMove + " n of simulations: " + nStates);
+		// System.out.println(bestMove + " n of simulations: " + nStates);
 		// returning the move.
 		return bestMove;
 	}
+
 	// this method make a new tree node from game state.
 	// Q and N are stored in two dimensional arrays where first index is the role
 	// the belong to and second is the action. they have the same size/dimension as
@@ -62,7 +65,7 @@ public class MCSearch {
 		for (Role role : propNetStateMachine.getRoles()) {
 			legalActions.add(propNetStateMachine.getLegalMoves(state, role));
 		}
-		//System.out.println(legalActions);
+		// System.out.println(legalActions);
 		double[][] Q = new double[legalActions.size()][];
 		int[][] N = new int[legalActions.size()][];
 		int i = 0;
@@ -77,50 +80,67 @@ public class MCSearch {
 	}
 
 	// Main method of the search, going throw all four stages.
-	public void mcSearch(Node node, long timeout)
+	public void mcSearch(Node root, long timeout)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		List<Integer> indexes;
 		List<Move> moves;
 		String contents;
 
 		while (System.currentTimeMillis() + 100 <= timeout) {
+			Node node = root;
 			// selection selection(node) chooses the best actions for all players and if we
 			// have corresponding state in tree its repeated there.
 			while (true) {
 				moves = new ArrayList<Move>();
 				indexes = selection(node);
-				contents = "[";
+				// contents = "[";
 				for (int i = 0; i < indexes.size(); i++) {
 					Move m = node.legalActions.get(i).get(indexes.get(i));
-					contents += m.toString() + ", ";
+					// contents += m.toString() + ", ";
 					moves.add(m);
 				}
-				contents = contents.substring(0, contents.length() - 2);
-				contents += "]";
-				if (node.next.contains(contents)) {
-					node = node.next.get(contents);
+				// contents = contents.substring(0, contents.length() - 2);
+				// contents += "]";
+				if (node.next.containsKey(indexes.toString())) {
+					node = node.next.get(indexes.toString());
+					if (node.terminal)
+						break;
 				} else {
 					break;
 				}
 			}
+			if (node.terminal) {
+
+				backProp(node, node.values);
+			} else {
 
 			// expand
 			BitSetMachineState nextstate = (BitSetMachineState) propNetStateMachine.getNextState(node.state, moves);
 			Node next = initNextNode((BitSetMachineState) nextstate, node, indexes);
-			node.next.put(contents, next);
+			if (propNetStateMachine.isTerminal(next.state)) {
+				next.terminal = true;
+				List<Integer> ret = new ArrayList<Integer>();
+				for (Role r : propNetStateMachine.getRoles()) {
+					ret.add(propNetStateMachine.getGoal(next.state, r));
+				}
+				next.values = ret;
+
+				backProp(next, next.values);
+			}
+			node.next.put(indexes.toString(), next);
 
 			// playout
 			List<Integer> value;
 			try {
 				value = runSimulation(next.state, timeout);
 			} catch (TimeOutException e) {
-				//System.out.println("no more time, Get out, out, out .... ");
+				// System.out.println("no more time, Get out, out, out .... ");
 				break;
 			}
 
 			// backprop
 			backProp(next, value);
-
+			}
 		}
 
 	}
