@@ -13,7 +13,6 @@ import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
 import galp.ggp.search.MCSearch;
 import galp.ggp.search.Node;
-import galp.ggp.statemachine.BitSetMachineState;
 
 public class MCGamer extends TrialSampleGamer {
 	int nStates;
@@ -31,17 +30,12 @@ public class MCGamer extends TrialSampleGamer {
 			for (GdlTerm sentence : lastMoves) {
 				jointMove.add(root.legalActions.get(r).indexOf(getStateMachine().getMoveFromTerm(sentence)));
 				r++;
-			} //
-				// System.out.println(jointMove);
-
+			}
 			root = root.exploredChildren.get(jointMove.toString());
 
-		} /*
-			 * else { root = search.initNextNode((BitSetMachineState) getCurrentState(),
-			 * null, null); }
-			 */
+		}
 		if (root == null)
-			root = search.initNextNode((BitSetMachineState) getCurrentState(), null, null);
+			root = search.initNextNode(getCurrentState(), null, null);
 		return search.search(root, timeout, getRole());
 	}
 
@@ -52,7 +46,7 @@ public class MCGamer extends TrialSampleGamer {
 		System.out.println("::::META GAME START::::");
 		search = new MCSearch(getStateMachine());
 
-		root = search.initNextNode((BitSetMachineState) getStateMachine().getInitialState(), null, null);
+		root = search.initNextNode(getStateMachine().getInitialState(), null, null);
 		search.search(root, timeout, getRole());
 		System.out.println("::::META GAME END::::");
 	}

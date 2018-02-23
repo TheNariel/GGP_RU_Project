@@ -163,7 +163,8 @@ public final class GamePlayer extends Thread implements Subject
 
            // GamePlayer player = new GamePlayer(9148, new ABTTGamer());
 
-            GamePlayer player = new GamePlayer(9147, new MCGamer());
+          //  GamePlayer player = new GamePlayer(9148, new RandomGamer());
+           GamePlayer player = new GamePlayer(9147, new MCGamer());
             player.run();
            System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {

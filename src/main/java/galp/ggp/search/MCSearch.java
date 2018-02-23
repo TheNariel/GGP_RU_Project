@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
+import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
 import org.ggp.base.util.statemachine.StateMachine;
@@ -12,7 +13,6 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
-import galp.ggp.statemachine.BitSetMachineState;
 import galp.ggp.statemachine.TimeOutException;
 
 public class MCSearch {
@@ -26,7 +26,12 @@ public class MCSearch {
 	public Move search(Node root, long timeout, Role role)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		nStates = 0;
-		mcSearch(root, timeout);
+		try {
+			mcSearch(root, timeout);
+		} catch (TimeOutException e) {
+
+			System.out.println("no more time, Get out, out, out .... ");
+		}
 
 		// finding the move with bigest N
 		Move bestMove = null;
@@ -46,7 +51,7 @@ public class MCSearch {
 			}
 		}
 
-		// System.out.println(bestMove + " n of simulations: " + nStates);
+		 System.out.println(bestMove + " n of simulations: " + nStates);
 		// returning the move.
 		return bestMove;
 	}
@@ -58,7 +63,7 @@ public class MCSearch {
 	// where are all the legal moves for all the roles.
 	// next is hash map, maping the string representation of joint move to a Node,
 	// representing state after that move.
-	public Node initNextNode(BitSetMachineState state, Node parent, List<Integer> moveFromParent)
+	public Node initNextNode(MachineState state, Node parent, List<Integer> moveFromParent)
 			throws MoveDefinitionException {
 
 		List<List<Move>> legalActions = new ArrayList<List<Move>>();
@@ -81,7 +86,7 @@ public class MCSearch {
 
 	// Main method of the search, going throw all four stages.
 	public void mcSearch(Node root, long timeout)
-			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
+			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException, TimeOutException {
 		List<Integer> indexes;
 		List<Move> moves;
 
@@ -114,8 +119,8 @@ public class MCSearch {
 			} else {
 
 				// expand
-				BitSetMachineState nextstate = (BitSetMachineState) propNetStateMachine.getNextState(node.state, moves);
-				Node next = initNextNode((BitSetMachineState) nextstate, node, indexes);
+				MachineState nextstate =  propNetStateMachine.getNextState(node.state, moves);
+				Node next = initNextNode( nextstate, node, indexes);
 				if (propNetStateMachine.isTerminal(next.state)) {
 					next.terminal = true;
 					List<Integer> ret = new ArrayList<Integer>();
@@ -131,12 +136,8 @@ public class MCSearch {
 
 					// playout
 					List<Integer> value;
-					try {
+
 						value = runSimulation(next.state, timeout);
-					} catch (TimeOutException e) {
-						// System.out.println("no more time, Get out, out, out .... ");
-						break;
-					}
 
 					// backprop
 					backProp(next, value);
@@ -210,13 +211,13 @@ public class MCSearch {
 
 	// simulating the random playuot of the game, returning values for all the
 	// roles.
-	public List<Integer> runSimulation(BitSetMachineState state, long timeout)
+	public List<Integer> runSimulation(MachineState state, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 
 		while (!propNetStateMachine.isTerminal(state)) {
 			if (System.currentTimeMillis() + 100 >= timeout)
 				throw new TimeOutException();
-			state = (BitSetMachineState) propNetStateMachine.getNextState(state,
+			state =  propNetStateMachine.getNextState(state,
 					propNetStateMachine.getRandomJointMove(state));
 		}
 
