@@ -10,7 +10,8 @@ import org.ggp.base.util.statemachine.StateMachine;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
-import org.ggp.base.util.statemachine.implementation.prover.ProverStateMachine;
+
+import galp.ggp.statemachine.TrialPropNetStateMachine;
 
 public class TrialSampleGamer extends StateMachineGamer {
 
@@ -53,7 +54,8 @@ public class TrialSampleGamer extends StateMachineGamer {
 	// This is the default State Machine
 	@Override
 	public StateMachine getInitialStateMachine() {
-		return new ProverStateMachine();
+		return new TrialPropNetStateMachine();
+//		return new ProverStateMachine();
 
 	}
 
