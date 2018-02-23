@@ -51,7 +51,15 @@ public class MCSearch {
 			}
 		}
 
-		 System.out.println(bestMove + " n of simulations: " + nStates);
+		for (int r = 0; r < root.N.length; r++) {
+			for (int m = 0; m < root.N[r].length; m++) {
+				System.out.println(root.legalActions.get(r).get(m)+"|Q: "+root.Q[r][m]+" |N: "+root.N[r][m]);
+			}
+
+		}
+
+		System.out.println(bestMove + " n of simulations: " + nStates);
+		System.out.println();
 		// returning the move.
 		return bestMove;
 	}
@@ -91,6 +99,7 @@ public class MCSearch {
 		List<Move> moves;
 
 		while (System.currentTimeMillis() + 100 <= timeout) {
+			nStates++;
 			Node node = root;
 			// selection selection(node) chooses the best actions for all players and if we
 			// have corresponding state in tree its repeated there.
@@ -119,8 +128,8 @@ public class MCSearch {
 			} else {
 
 				// expand
-				MachineState nextstate =  propNetStateMachine.getNextState(node.state, moves);
-				Node next = initNextNode( nextstate, node, indexes);
+				MachineState nextstate = propNetStateMachine.getNextState(node.state, moves);
+				Node next = initNextNode(nextstate, node, indexes);
 				if (propNetStateMachine.isTerminal(next.state)) {
 					next.terminal = true;
 					List<Integer> ret = new ArrayList<Integer>();
@@ -137,10 +146,12 @@ public class MCSearch {
 					// playout
 					List<Integer> value;
 
-						value = runSimulation(next.state, timeout);
+					value = runSimulation(next.state, timeout);
 
 					// backprop
 					backProp(next, value);
+
+
 				}
 			}
 		}
@@ -217,15 +228,13 @@ public class MCSearch {
 		while (!propNetStateMachine.isTerminal(state)) {
 			if (System.currentTimeMillis() + 100 >= timeout)
 				throw new TimeOutException();
-			state =  propNetStateMachine.getNextState(state,
-					propNetStateMachine.getRandomJointMove(state));
+			state = propNetStateMachine.getNextState(state, propNetStateMachine.getRandomJointMove(state));
 		}
 
 		List<Integer> ret = new ArrayList<Integer>();
 		for (Role r : propNetStateMachine.getRoles()) {
 			ret.add(propNetStateMachine.getGoal(state, r));
 		}
-		nStates++;
 		return ret;
 
 	}
