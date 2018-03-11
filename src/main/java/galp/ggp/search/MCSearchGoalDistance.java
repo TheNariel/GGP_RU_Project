@@ -20,15 +20,15 @@ import galp.ggp.statemachine.TrialPropNetStateMachine;
 import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
 
 public class MCSearchGoalDistance {
-	TrialPropNetStateMachine orginalPropNetStateMachine;
+	TrialPropNetStateMachine originalPropNetStateMachine;
 	TrialPropNetStateMachine reducedPropNetStateMachine;
 	PropNetStructure structure;
 	int nStates;
-	int minGoal = 50;
+	int minGoal = 75;
 
-	public MCSearchGoalDistance(TrialPropNetStateMachine orginalPropNetStateMachine,
+	public MCSearchGoalDistance(TrialPropNetStateMachine originalPropNetStateMachine,
 			TrialPropNetStateMachine reducedPropNetStateMachine) {
-		this.orginalPropNetStateMachine = orginalPropNetStateMachine;
+		this.originalPropNetStateMachine = originalPropNetStateMachine;
 		this.reducedPropNetStateMachine = reducedPropNetStateMachine;
 	}
 
@@ -44,8 +44,8 @@ public class MCSearchGoalDistance {
 
 		// finding the move with bigest N
 		Move bestMove = null;
-		for (int r = 0; r < orginalPropNetStateMachine.getRoles().size(); r++) {
-			if (orginalPropNetStateMachine.getRoles().get(r).equals(role)) {
+		for (int r = 0; r < originalPropNetStateMachine.getRoles().size(); r++) {
+			if (originalPropNetStateMachine.getRoles().get(r).equals(role)) {
 				int i = 0;
 				int max = root.N[r][0];
 				for (int m = 1; m < root.N[r].length; m++) {
@@ -62,13 +62,14 @@ public class MCSearchGoalDistance {
 
 		for (int r = 0; r < root.N.length; r++) {
 			for (int m = 0; m < root.N[r].length; m++) {
-				System.out.println(root.legalActions.get(r).get(m) + "|Q: " + root.Q[r][m] + " |N: " + root.N[r][m]);
+				// System.out.println(root.legalActions.get(r).get(m) + "|Q: " + root.Q[r][m] +
+				// " |N: " + root.N[r][m]);
 			}
 
 		}
 
-		System.out.println(bestMove + " n of simulations: " + nStates);
-		System.out.println();
+		// System.out.println(bestMove + " n of simulations: " + nStates);
+		// System.out.println();
 		// returning the move.
 		return bestMove;
 	}
@@ -84,8 +85,8 @@ public class MCSearchGoalDistance {
 			throws MoveDefinitionException {
 
 		List<List<Move>> legalActions = new ArrayList<List<Move>>();
-		for (Role role : orginalPropNetStateMachine.getRoles()) {
-			legalActions.add(orginalPropNetStateMachine.getLegalMoves(state, role));
+		for (Role role : originalPropNetStateMachine.getRoles()) {
+			legalActions.add(originalPropNetStateMachine.getLegalMoves(state, role));
 		}
 		// System.out.println(legalActions);
 		double[][] Q = new double[legalActions.size()][];
@@ -135,28 +136,26 @@ public class MCSearchGoalDistance {
 
 				backProp(node, node.values);
 			} else {
-
 				// EXPAND
-				// - find all legal moves from state
-				List<List<Move>> legalMoves = orginalPropNetStateMachine.getLegalJointMoves(node.state);
-				// - calculate heuristics for all moves
+				List<List<Move>> legalMoves = originalPropNetStateMachine.getLegalJointMoves(node.state);
 				List<Integer> moveScore = new ArrayList<>();
 				MachineState nextState;
+				int legalMoveNr = 1;
+
 				for (List<Move> legalMove : legalMoves) {
-					nextState = orginalPropNetStateMachine.getNextState(node.state, legalMove);
-					//System.out.println(nextState.toString());
-					moveScore.add(evaluateState(nextState));
+					legalMoveNr++;
+					nextState = originalPropNetStateMachine.getNextState(node.state, legalMove);
+					moveScore.add(evaluateState(nextState, timeout));
 				}
-				// - find best move based on the heuristics score
 				moves = legalMoves.get(getIndexOfLargest(moveScore));
 
-				MachineState nextstate = orginalPropNetStateMachine.getNextState(node.state, moves);
+				MachineState nextstate = originalPropNetStateMachine.getNextState(node.state, moves);
 				Node next = initNextNode(nextstate, node, indexes);
-				if (orginalPropNetStateMachine.isTerminal(next.state)) {
+				if (originalPropNetStateMachine.isTerminal(next.state)) {
 					next.terminal = true;
 					List<Integer> ret = new ArrayList<Integer>();
-					for (Role r : orginalPropNetStateMachine.getRoles()) {
-						ret.add(orginalPropNetStateMachine.getGoal(next.state, r));
+					for (Role r : originalPropNetStateMachine.getRoles()) {
+						ret.add(originalPropNetStateMachine.getGoal(next.state, r));
 					}
 					next.values = ret;
 
@@ -193,40 +192,52 @@ public class MCSearchGoalDistance {
 		return index;
 	}
 
-	private Integer evaluateState(MachineState tempState)
+	// evaluate a state of the game based on min depth to a winning terminal state for all players
+	private Integer evaluateState(MachineState originalState, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
-
-		// MachineState reducedState = reducedPropNetStateMachine.getMachineStateFromSentenceList(tempState.getContents());
-		Set<GdlSentence> sentenceList = tempState.getContents();
-		BitSetMachineState reducedState = new BitSetMachineState(sentenceList,reducedPropNetStateMachine.structure);
-		//System.out.println(reducedState.toString());
-		//MachineState reducedState = reducedPropNetStateMachine.getMachineStateFromSentenceList(sentenceList);
+		Set<GdlSentence> sentenceList = originalState.getContents();
+		BitSetMachineState reducedState = new BitSetMachineState(sentenceList, reducedPropNetStateMachine.structure);
 		List<Integer> depths;
-		// depths = runSimulationDepth(tempStatee);
-		depths = runSimulationDepth(reducedState);
-		// - calculate heuristic
-		int score = 100 / depths.get(0);
-		System.out.println("returning score: " + score);
+		depths = runSimulationDepth(reducedState, timeout);
+		int score = 100 / (depths.get(0) + 1);
 		return score;
 	}
 
-	// simulating the random playuot of the game, returning depth of a winning
+	private void printState(MachineState state) {
+		for (GdlSentence sentence : state.getContents()) {
+			System.out.println("    " + sentence);
+		}
+	}
+
+	// simulating the random playout of the game, returning depth of a winning
 	// terminal state
-	private List<Integer> runSimulationDepth(MachineState reducedState)
+	private List<Integer> runSimulationDepth(MachineState reducedState, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 		Role onePRole = reducedPropNetStateMachine.getRoles().get(0);
 		int depth = 0;
-		orginalPropNetStateMachine.isTerminal(reducedState);
-		reducedPropNetStateMachine.isTerminal(reducedState);
-		reducedPropNetStateMachine.getGoal(reducedState, onePRole);
-		while ((!reducedPropNetStateMachine.isTerminal(reducedState))
-				&& (reducedPropNetStateMachine.getGoal(reducedState, onePRole) > minGoal)) {
-			// if (System.currentTimeMillis() + 100 >= timeout)
-			// throw new TimeOutException();
-			reducedState = reducedPropNetStateMachine.getNextState(reducedState,
-					reducedPropNetStateMachine.getRandomJointMove(reducedState));
+		boolean runSimulation = true;
+		if (reducedPropNetStateMachine.isTerminal(reducedState)) {
+//			System.out.println(":::::::::::::::::::::::::::::::::::: initial reduced State is terminal!!!!!!!!");
+			runSimulation = false;
+			}
+
+		while (runSimulation) {
+			if ((reducedPropNetStateMachine.isTerminal(reducedState))
+					&& (reducedPropNetStateMachine.getGoal(reducedState, onePRole) > minGoal))
+				break;
+			if (depth >= 100)
+				break;
+			if (reducedPropNetStateMachine.getLegalJointMoves(reducedState).size() != 0) {
+				reducedState = reducedPropNetStateMachine.getNextState(reducedState,
+						reducedPropNetStateMachine.getRandomJointMove(reducedState));
+			} else {
+				break;
+			}
 			depth++;
+			if (System.currentTimeMillis() + 100 >= timeout)
+				throw new TimeOutException();
 		}
+
 		List<Integer> depthList = new ArrayList<>();
 		depthList.add(depth);
 		return depthList;
@@ -299,16 +310,16 @@ public class MCSearchGoalDistance {
 	public List<Integer> runSimulation(MachineState state, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 
-		while (!orginalPropNetStateMachine.isTerminal(state)) {
+		while (!originalPropNetStateMachine.isTerminal(state)) {
 			if (System.currentTimeMillis() + 100 >= timeout)
 				throw new TimeOutException();
-			state = orginalPropNetStateMachine.getNextState(state,
-					orginalPropNetStateMachine.getRandomJointMove(state));
+			state = originalPropNetStateMachine.getNextState(state,
+					originalPropNetStateMachine.getRandomJointMove(state));
 		}
 
 		List<Integer> ret = new ArrayList<Integer>();
-		for (Role r : orginalPropNetStateMachine.getRoles()) {
-			ret.add(orginalPropNetStateMachine.getGoal(state, r));
+		for (Role r : originalPropNetStateMachine.getRoles()) {
+			ret.add(originalPropNetStateMachine.getGoal(state, r));
 		}
 		return ret;
 

@@ -25,6 +25,8 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 	MCSearchGoalDistance search;
 	TrialPropNetStateMachine orginalStateMachine;
 	TrialPropNetStateMachine reducedStateMachine;
+	//Debug options
+	boolean printRules = false;
 
 	@Override
 	public Move stateMachineSelectMove(long timeout)
@@ -55,11 +57,19 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 		reducedStateMachine = new TrialPropNetStateMachine();
 		// Filter the rules
 		List<Gdl> rules = orginalStateMachine.getRules();
-		System.out.println("::::Rules");
-		for (Gdl rule: rules) {
-			System.out.println(rule);
+		List<Gdl> reducedRules = reduceRules(orginalStateMachine.getRules());
+
+		//Print rules
+		if (printRules) {
+			System.out.println(":::: Original Rules");
+			for (Gdl rule : rules) {
+				System.out.println(rule);
+			}
+			System.out.println("\n:::: Reduced Rules");
+			for (Gdl rule : reducedRules) {
+				System.out.println(rule);
+			}
 		}
-		List<Gdl> reducedRules = filterRules(orginalStateMachine.getRules());
 		// Initialize StateMachine
 		reducedStateMachine.initialize(reducedRules);
 
@@ -70,8 +80,6 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 		search.search(root, timeout, getRole());
 		System.out.println("::::META GAME END::::");
 
-
-
 	}
 
 	@Override
@@ -79,9 +87,9 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 		return new EmptyDetailPanel();
 	}
 
-	public List<Gdl> filterRules(List<Gdl> orgRules) {
+	public List<Gdl> reduceRules(List<Gdl> orgRules) {
 		try {
-			List<Gdl> filteredRules = new ArrayList<Gdl>();
+			List<Gdl> reducedRules = new ArrayList<Gdl>();
 			String rule;
 			for (int i = 0; i < orgRules.size(); i++) {
 				rule = orgRules.get(i).toString();
@@ -94,9 +102,11 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 
 				// replace does with legal
 				rule = rule.replaceAll("does", "legal");
-				filteredRules.add(GdlFactory.create(rule));
+				reducedRules.add(GdlFactory.create(rule));
 			}
-			return filteredRules;
+			reducedRules.add(GdlFactory.create("( <= ( next ( F ) ) ( true ( F ) ) )"));
+			reducedRules.add(GdlFactory.create("( trueValue )"));
+			return reducedRules;
 		} catch (GdlFormatException e) {
 			e.printStackTrace();
 			return null;
@@ -105,6 +115,5 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 			return null;
 		}
 	}
-
 
 }
