@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.Role;
@@ -12,6 +14,7 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 
+import galp.ggp.statemachine.BitSetMachineState;
 import galp.ggp.statemachine.TimeOutException;
 import galp.ggp.statemachine.TrialPropNetStateMachine;
 import is.ru.cadia.ggp.propnet.structure.PropNetStructure;
@@ -141,6 +144,7 @@ public class MCSearchGoalDistance {
 				MachineState nextState;
 				for (List<Move> legalMove : legalMoves) {
 					nextState = orginalPropNetStateMachine.getNextState(node.state, legalMove);
+					//System.out.println(nextState.toString());
 					moveScore.add(evaluateState(nextState));
 				}
 				// - find best move based on the heuristics score
@@ -193,8 +197,10 @@ public class MCSearchGoalDistance {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 
 		// MachineState reducedState = reducedPropNetStateMachine.getMachineStateFromSentenceList(tempState.getContents());
-		MachineState reducedState = reducedPropNetStateMachine
-				.getMachineStateFromSentenceList(orginalPropNetStateMachine.getInitialState().getContents());
+		Set<GdlSentence> sentenceList = tempState.getContents();
+		BitSetMachineState reducedState = new BitSetMachineState(sentenceList,reducedPropNetStateMachine.structure);
+		//System.out.println(reducedState.toString());
+		//MachineState reducedState = reducedPropNetStateMachine.getMachineStateFromSentenceList(sentenceList);
 		List<Integer> depths;
 		// depths = runSimulationDepth(tempStatee);
 		depths = runSimulationDepth(reducedState);

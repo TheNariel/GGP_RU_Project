@@ -49,11 +49,19 @@ public class BaseProposition extends StaticComponent {
 		sb.append(", #outputs: ").append(outputs.length);
 		sb.append(", cyclic: ").append(isCyclic);
 		sb.append(", symbols: [");
+		sb.append(getSentence());
+		sb.append("]} initValue: ");
+		sb.append(initialValue);
+		return sb.toString();
+	}
+	public String getSentence() {
+
+		StringBuilder sb = new StringBuilder("");
 		for (GdlSentence sentence : sentences) {
 			sb.append(sentence.toString()).append(", ");
 		}
-		sb.append("]} initValue: ");
-		sb.append(initialValue);
+		sb.deleteCharAt(sb.length()-1);
+		sb.deleteCharAt(sb.length()-1);
 		return sb.toString();
 	}
 }

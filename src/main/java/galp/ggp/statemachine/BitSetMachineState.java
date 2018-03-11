@@ -14,18 +14,34 @@ public class BitSetMachineState extends MachineState {
 	public BitSet state;
 	PropNetStructure structure;
 	BitSet seen = new BitSet();
-	public BitSetMachineState(BitSet state,PropNetStructure structure) {
+
+	public BitSetMachineState(BitSet state, PropNetStructure structure) {
 		super();
 		this.state = state;
 		this.structure = structure;
 	}
 
+	public BitSetMachineState(Set<GdlSentence> contents, PropNetStructure structure) {
+		super();
+		state = new BitSet();
+		this.structure = structure;
+		for (BaseProposition bp : structure.getBasePropositions()) {
+			for (GdlSentence sentence : contents) {
+				if (sentence.toString().equals(bp.getSentence())) {
+					state.set(bp.id);
+				}
+
+			}
+		}
+
+	}
+
 	@Override
 	public Set<GdlSentence> getContents() {
 		Set<GdlSentence> contents = new HashSet<GdlSentence>();
-		for(BaseProposition bp:structure.getBasePropositions()) {
-			if(state.get(bp.id)) {
-				for(GdlSentence s:bp.sentences) {
+		for (BaseProposition bp : structure.getBasePropositions()) {
+			if (state.get(bp.id)) {
+				for (GdlSentence s : bp.sentences) {
 					contents.add(s);
 				}
 			}
@@ -35,7 +51,7 @@ public class BitSetMachineState extends MachineState {
 
 	@Override
 	public MachineState clone() {
-		return new BitSetMachineState((BitSet)state.clone(),structure);
+		return new BitSetMachineState((BitSet) state.clone(), structure);
 	}
 
 }
