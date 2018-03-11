@@ -25,7 +25,9 @@ import is.ru.cadia.ggp.propnet.structure.components.StaticComponent;
 public class TrialPropNetStateMachine extends StateMachine {
 	private BitSetMachineState initialState;
 	private ImmutableList<Role> roles;
-	PropNetStructure structure = null;
+	private List<Gdl> rules;
+	public PropNetStructure structure = null;
+
 	public PropNetStructure getStructure() {
 		return structure;
 	}
@@ -38,7 +40,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 
 	@Override
 	public void initialize(List<Gdl> description) {
+		rules = description;
 		System.out.println("get init propnet");
+
 		PropNetStructureFactory factory = new GGPBasePropNetStructureFactory();
 
 		try {
@@ -57,9 +61,7 @@ public class TrialPropNetStateMachine extends StateMachine {
 		for (BaseProposition prop : structure.getBasePropositions()) {
 			if (prop.initialValue) {
 				state.set(prop.id);
-
 			}
-
 		}
 		MachineState ret = new BitSetMachineState(state, structure);
 		return ret;
@@ -69,9 +71,11 @@ public class TrialPropNetStateMachine extends StateMachine {
 	public int getGoal(MachineState state, Role role) throws GoalDefinitionException {
 		int roleid = structure.getRoleId(role);
 		StaticComponent[] Goals = structure.getGoalPropositions(roleid);
-		for(int i = 0; i < Goals.length;i++) {
-			boolean legal = checkLegality(state,Goals[i]);
-			if(legal) {return structure.getGoalValues(roleid)[i];}
+		for (int i = 0; i < Goals.length; i++) {
+			boolean legal = checkLegality(state, Goals[i]);
+			if (legal) {
+				return structure.getGoalValues(roleid)[i];
+			}
 		}
 		return 0;
 	}
@@ -79,8 +83,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 	@Override
 	public boolean isTerminal(MachineState state) {
 		StaticComponent Term = structure.getTerminalProposition();
-		boolean terminal = checkLegality(state,Term);
-		if(terminal) return true;
+		boolean terminal = checkLegality(state, Term);
+		if (terminal)
+			return true;
 
 		return false;
 	}
@@ -116,9 +121,9 @@ public class TrialPropNetStateMachine extends StateMachine {
 	@Override
 	public MachineState getNextState(MachineState state, List<Move> moves) throws TransitionDefinitionException {
 
-		int r =0;
+		int r = 0;
 		BitSetMachineState currentState = (BitSetMachineState) state.clone();
-		for(Move m : moves) {
+		for (Move m : moves) {
 			PropNetMove pnm = structure.getPropNetMove(roles.get(r), m);
 			r++;
 			currentState.state.set(pnm.getInputComponent().id);
@@ -127,12 +132,12 @@ public class TrialPropNetStateMachine extends StateMachine {
 		BitSet nextState = new BitSet();
 		for (BaseProposition prop : structure.getBasePropositions()) {
 
-			if(checkLegality(currentState,  prop.nextComponent)) {
+			if (checkLegality(currentState, prop.nextComponent)) {
 				nextState.set(prop.id);
 			}
 
 		}
-		currentState.state=(BitSet) nextState.clone();
+		currentState.state = (BitSet) nextState.clone();
 		return currentState;
 	}
 
@@ -167,7 +172,6 @@ public class TrialPropNetStateMachine extends StateMachine {
 		}
 		return currentState.state.get(root.id);
 	}
-
 
 	private boolean evaluate(StaticComponent current, BitSet currentInternalState) {
 		boolean ret = false;
@@ -208,6 +212,10 @@ public class TrialPropNetStateMachine extends StateMachine {
 			break;
 		}
 		return ret;
+	}
+
+	public List<Gdl> getRules() {
+		return rules;
 	}
 
 }
