@@ -77,7 +77,7 @@ public class MCSearchGoalDistance {
 		System.out.println("Returning move: " + bestMove);
 		System.out.println("Timeout: " + timeout);
 		System.out.println("Return time: " + System.currentTimeMillis());
-		System.out.println("Timeout - currentTime" + (timeout - System.currentTimeMillis()));
+		System.out.println("Timeout - currentTime = " + (timeout - System.currentTimeMillis()));
 		return bestMove;
 	}
 
