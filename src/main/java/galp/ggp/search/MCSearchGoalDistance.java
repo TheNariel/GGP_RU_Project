@@ -41,9 +41,9 @@ public class MCSearchGoalDistance {
 		try {
 			mcSearch(root, timeout, role);
 		} catch (TimeOutException e) {
-			System.out.println("Exception time: " + timeException);
-			System.out.println("Catch time: " + System.currentTimeMillis());
-			System.out.println("Delay in ms: " + (timeException - System.currentTimeMillis()));
+//			System.out.println("Exception time: " + timeException);
+//			System.out.println("Catch time: " + System.currentTimeMillis());
+//			System.out.println("Delay in ms: " + (timeException - System.currentTimeMillis()));
 			System.out.println("no more time, Get out, out, out .... ");
 		}
 
@@ -64,6 +64,7 @@ public class MCSearchGoalDistance {
 		}
 
 		// for (int r = 0; r < root.N.length; r++) {
+
 		// for (int m = 0; m < root.N[r].length; m++) {
 		// System.out.println(root.legalActions.get(r).get(m) + "|Q: " + root.Q[r][m] +
 		// " |N: " + root.N[r][m]);
@@ -74,6 +75,9 @@ public class MCSearchGoalDistance {
 		// System.out.println();
 		// returning the move.
 		System.out.println("Returning move: " + bestMove);
+		System.out.println("Timeout: " + timeout);
+		System.out.println("Return time: " + System.currentTimeMillis());
+		System.out.println("Timeout - currentTime" + (timeout - System.currentTimeMillis()));
 		return bestMove;
 	}
 
