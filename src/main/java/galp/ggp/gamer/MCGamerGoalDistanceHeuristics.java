@@ -51,18 +51,28 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 	@Override
 	public void stateMachineMetaGame(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-		// Get orginal StateMachine
+
+
+		// Get original StateMachine
 		orginalStateMachine = (TrialPropNetStateMachine) getStateMachine();
+
+		// Copy rules
+		List<Gdl> orginalRules = orginalStateMachine.getRules();
+		List<Gdl> copiedRules = new ArrayList<Gdl>();
+		for(Gdl rule : orginalRules) {
+			copiedRules.add(rule);
+		}
+
 		// Create trialPropNetStateMachine
 		reducedStateMachine = new TrialPropNetStateMachine();
-		// Filter the rules
-		List<Gdl> rules = orginalStateMachine.getRules();
-		List<Gdl> reducedRules = reduceRules(orginalStateMachine.getRules());
+
+		List<Gdl> reducedRules = null;
+		reducedRules = reduceRules(copiedRules);
 
 		//Print rules
 		if (printRules) {
 			System.out.println(":::: Original Rules");
-			for (Gdl rule : rules) {
+			for (Gdl rule : orginalRules) {
 				System.out.println(rule);
 			}
 			System.out.println("\n:::: Reduced Rules");

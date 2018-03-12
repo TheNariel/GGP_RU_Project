@@ -24,7 +24,9 @@ public class MCSearchGoalDistance {
 	TrialPropNetStateMachine reducedPropNetStateMachine;
 	PropNetStructure structure;
 	int nStates;
-	int minGoal = 75;
+	int minGoal = 51;
+	long timeoutBuffer = 100;
+	long timeException;
 
 	public MCSearchGoalDistance(TrialPropNetStateMachine originalPropNetStateMachine,
 			TrialPropNetStateMachine reducedPropNetStateMachine) {
@@ -35,14 +37,17 @@ public class MCSearchGoalDistance {
 	public Move search(Node root, long timeout, Role role)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException {
 		nStates = 0;
+		long time1 = 0;
 		try {
-			mcSearch(root, timeout);
+			mcSearch(root, timeout, role);
 		} catch (TimeOutException e) {
-
+			System.out.println("Exception time: " + timeException);
+			System.out.println("Catch time: " + System.currentTimeMillis());
+			System.out.println("Delay in ms: " + (timeException - System.currentTimeMillis()));
 			System.out.println("no more time, Get out, out, out .... ");
 		}
 
-		// finding the move with bigest N
+		// finding the move with biggest N
 		Move bestMove = null;
 		for (int r = 0; r < originalPropNetStateMachine.getRoles().size(); r++) {
 			if (originalPropNetStateMachine.getRoles().get(r).equals(role)) {
@@ -54,23 +59,21 @@ public class MCSearchGoalDistance {
 						i = m;
 					}
 				}
-
 				bestMove = root.legalActions.get(r).get(i);
-
 			}
 		}
 
-		for (int r = 0; r < root.N.length; r++) {
-			for (int m = 0; m < root.N[r].length; m++) {
-				// System.out.println(root.legalActions.get(r).get(m) + "|Q: " + root.Q[r][m] +
-				// " |N: " + root.N[r][m]);
-			}
-
-		}
+		// for (int r = 0; r < root.N.length; r++) {
+		// for (int m = 0; m < root.N[r].length; m++) {
+		// System.out.println(root.legalActions.get(r).get(m) + "|Q: " + root.Q[r][m] +
+		// " |N: " + root.N[r][m]);
+		// }
+		// }
 
 		// System.out.println(bestMove + " n of simulations: " + nStates);
 		// System.out.println();
 		// returning the move.
+		System.out.println("Returning move: " + bestMove);
 		return bestMove;
 	}
 
@@ -103,12 +106,12 @@ public class MCSearchGoalDistance {
 	}
 
 	// Main method of the search, going through all four stages.
-	public void mcSearch(Node root, long timeout)
+	public void mcSearch(Node root, long timeout, Role role)
 			throws MoveDefinitionException, TransitionDefinitionException, GoalDefinitionException, TimeOutException {
 		List<Integer> indexes;
 		List<Move> moves;
 
-		while (System.currentTimeMillis() + 100 <= timeout) {
+		while (System.currentTimeMillis() + timeoutBuffer <= timeout) {
 			nStates++;
 			Node node = root;
 			// selection selection(node) chooses the best actions for all players and if we
@@ -137,6 +140,8 @@ public class MCSearchGoalDistance {
 				backProp(node, node.values);
 			} else {
 				// EXPAND
+				// Select move for expansion based on "minimum depth to a winning state"
+				// heuristics
 				List<List<Move>> legalMoves = originalPropNetStateMachine.getLegalJointMoves(node.state);
 				List<Integer> moveScore = new ArrayList<>();
 				MachineState nextState;
@@ -145,12 +150,17 @@ public class MCSearchGoalDistance {
 				for (List<Move> legalMove : legalMoves) {
 					legalMoveNr++;
 					nextState = originalPropNetStateMachine.getNextState(node.state, legalMove);
+					if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
+						timeException = System.currentTimeMillis();
+						throw new TimeOutException();
+					}
 					moveScore.add(evaluateState(nextState, timeout));
 				}
 				moves = legalMoves.get(getIndexOfLargest(moveScore));
 
 				MachineState nextstate = originalPropNetStateMachine.getNextState(node.state, moves);
 				Node next = initNextNode(nextstate, node, indexes);
+				// Check if new state is a terminal state
 				if (originalPropNetStateMachine.isTerminal(next.state)) {
 					next.terminal = true;
 					List<Integer> ret = new ArrayList<Integer>();
@@ -192,13 +202,15 @@ public class MCSearchGoalDistance {
 		return index;
 	}
 
-	// evaluate a state of the game based on min depth to a winning terminal state for all players
+	// evaluate a state of the game based on min depth to a winning terminal state
+	// for all players
 	private Integer evaluateState(MachineState originalState, long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 		Set<GdlSentence> sentenceList = originalState.getContents();
 		BitSetMachineState reducedState = new BitSetMachineState(sentenceList, reducedPropNetStateMachine.structure);
 		List<Integer> depths;
 		depths = runSimulationDepth(reducedState, timeout);
+
 		int score = 100 / (depths.get(0) + 1);
 		return score;
 	}
@@ -217,9 +229,10 @@ public class MCSearchGoalDistance {
 		int depth = 0;
 		boolean runSimulation = true;
 		if (reducedPropNetStateMachine.isTerminal(reducedState)) {
-//			System.out.println(":::::::::::::::::::::::::::::::::::: initial reduced State is terminal!!!!!!!!");
+			// System.out.println(":::::::::::::::::::::::::::::::::::: initial reduced
+			// State is terminal!!!!!!!!");
 			runSimulation = false;
-			}
+		}
 
 		while (runSimulation) {
 			if ((reducedPropNetStateMachine.isTerminal(reducedState))
@@ -234,8 +247,10 @@ public class MCSearchGoalDistance {
 				break;
 			}
 			depth++;
-			if (System.currentTimeMillis() + 100 >= timeout)
+			if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
+				timeException = System.currentTimeMillis();
 				throw new TimeOutException();
+			}
 		}
 
 		List<Integer> depthList = new ArrayList<>();
@@ -311,8 +326,10 @@ public class MCSearchGoalDistance {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException, TimeOutException {
 
 		while (!originalPropNetStateMachine.isTerminal(state)) {
-			if (System.currentTimeMillis() + 100 >= timeout)
+			if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
+				timeException = System.currentTimeMillis();
 				throw new TimeOutException();
+			}
 			state = originalPropNetStateMachine.getNextState(state,
 					originalPropNetStateMachine.getRandomJointMove(state));
 		}
