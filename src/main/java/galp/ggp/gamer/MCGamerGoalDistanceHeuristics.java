@@ -1,6 +1,8 @@
 package galp.ggp.gamer;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.ggp.base.apps.player.detail.DetailPanel;
@@ -8,6 +10,7 @@ import org.ggp.base.apps.player.detail.EmptyDetailPanel;
 import org.ggp.base.util.gdl.factory.GdlFactory;
 import org.ggp.base.util.gdl.factory.exceptions.GdlFormatException;
 import org.ggp.base.util.gdl.grammar.Gdl;
+import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.gdl.grammar.GdlTerm;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
@@ -33,6 +36,8 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 
 		List<GdlTerm> lastMoves = getMatch().getMostRecentMoves();
+		System.out.println("::: LastMoves" + lastMoves);
+
 		if (lastMoves != null) {
 			List<Integer> jointMove = new ArrayList<Integer>();
 			int r = 0;
@@ -43,8 +48,25 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 			root = root.exploredChildren.get(jointMove.toString());
 
 		}
+		List<GdlSentence> l = new ArrayList<>(getCurrentState().getContents());
+		Collections.sort(l, new Comparator<GdlSentence>() {
+			@Override
+			public int compare(GdlSentence s1, GdlSentence s2) {
+				return s1.toString().compareTo(s2.toString());
+			}
+		});
+
+
+//		assert(root.state.equals(getCurrentState()));
+
+
+		System.out.println("::: currentState " + l);
 		if (root == null)
 			root = search.initNextNode(getCurrentState(), null, null);
+		System.out.println(":::::::: LegalMoves before search, after reducePropNet creation");
+		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
+			System.out.println(legalMove);
+		}
 		return search.search(root, timeout, getRole());
 	}
 
@@ -114,7 +136,7 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 				rule = rule.replaceAll("does", "legal");
 				reducedRules.add(GdlFactory.create(rule));
 			}
-			reducedRules.add(GdlFactory.create("( <= ( next ( F ) ) ( true ( F ) ) )"));
+			reducedRules.add(GdlFactory.create("( <= ( next ( ?F ) ) ( true ( ?F ) ) )"));
 			reducedRules.add(GdlFactory.create("( trueValue )"));
 			return reducedRules;
 		} catch (GdlFormatException e) {

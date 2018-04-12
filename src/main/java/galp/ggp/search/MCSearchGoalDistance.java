@@ -41,9 +41,10 @@ public class MCSearchGoalDistance {
 		try {
 			mcSearch(root, timeout, role);
 		} catch (TimeOutException e) {
-//			System.out.println("Exception time: " + timeException);
-//			System.out.println("Catch time: " + System.currentTimeMillis());
-//			System.out.println("Delay in ms: " + (timeException - System.currentTimeMillis()));
+			// System.out.println("Exception time: " + timeException);
+			// System.out.println("Catch time: " + System.currentTimeMillis());
+			// System.out.println("Delay in ms: " + (timeException -
+			// System.currentTimeMillis()));
 			System.out.println("no more time, Get out, out, out .... ");
 		}
 
@@ -146,7 +147,7 @@ public class MCSearchGoalDistance {
 				// EXPAND
 				// Select move for expansion based on "minimum depth to a winning state"
 				// heuristics
-				List<List<Move>> legalMoves = originalPropNetStateMachine.getLegalJointMoves(node.state);
+				List<List<Move>> legalMoves = originalPropNetStateMachine.getLegalJointMoves(node.state); //node.legalActions;
 				List<Integer> moveScore = new ArrayList<>();
 				MachineState nextState;
 				int legalMoveNr = 1;
@@ -156,11 +157,24 @@ public class MCSearchGoalDistance {
 					nextState = originalPropNetStateMachine.getNextState(node.state, legalMove);
 					if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
 						timeException = System.currentTimeMillis();
+						System.out.println("Exception 159");
 						throw new TimeOutException();
 					}
 					moveScore.add(evaluateState(nextState, timeout));
 				}
-				moves = legalMoves.get(getIndexOfLargest(moveScore));
+
+				while (true) {
+					moves = legalMoves.get(getIndexOfLargest(moveScore));
+					List<Integer> indexesOfMoves = new ArrayList<>();
+					for (int roles = 0; roles < moves.size(); roles++) {
+						indexesOfMoves.add(node.legalActions.get(roles).indexOf(moves.get(roles)));
+					}
+					if (node.exploredChildren.containsKey(indexesOfMoves.toString())) {
+						moveScore.set(getIndexOfLargest(moveScore), -1);
+					} else {
+						break;
+					}
+				}
 
 				MachineState nextstate = originalPropNetStateMachine.getNextState(node.state, moves);
 				Node next = initNextNode(nextstate, node, indexes);
@@ -253,6 +267,7 @@ public class MCSearchGoalDistance {
 			depth++;
 			if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
 				timeException = System.currentTimeMillis();
+				System.out.println("Exception 257");
 				throw new TimeOutException();
 			}
 		}
@@ -332,6 +347,7 @@ public class MCSearchGoalDistance {
 		while (!originalPropNetStateMachine.isTerminal(state)) {
 			if (System.currentTimeMillis() + timeoutBuffer >= timeout) {
 				timeException = System.currentTimeMillis();
+				System.out.println("Exception 337");
 				throw new TimeOutException();
 			}
 			state = originalPropNetStateMachine.getNextState(state,

@@ -10,6 +10,7 @@ import org.ggp.base.player.event.PlayerDroppedPacketEvent;
 import org.ggp.base.player.event.PlayerReceivedMessageEvent;
 import org.ggp.base.player.event.PlayerSentMessageEvent;
 import org.ggp.base.player.gamer.Gamer;
+import org.ggp.base.player.gamer.statemachine.random.RandomGamer;
 import org.ggp.base.player.request.factory.RequestFactory;
 import org.ggp.base.player.request.grammar.Request;
 import org.ggp.base.util.http.HttpReader;
@@ -19,17 +20,15 @@ import org.ggp.base.util.observer.Event;
 import org.ggp.base.util.observer.Observer;
 import org.ggp.base.util.observer.Subject;
 
-import galp.ggp.gamer.MCGamer;
 
-
-public final class GamePlayer47MCGamer extends Thread implements Subject
+public final class GamePlayer54Random3 extends Thread implements Subject
 {
     private final int port;
     private final Gamer gamer;
     private ServerSocket listener;
     private final List<Observer> observers;
 
-    public GamePlayer47MCGamer(int port, Gamer gamer) throws IOException
+    public GamePlayer54Random3(int port, Gamer gamer) throws IOException
     {
         observers = new ArrayList<Observer>();
         listener = null;
@@ -163,7 +162,7 @@ public final class GamePlayer47MCGamer extends Thread implements Subject
 
            // GamePlayer player = new GamePlayer(9148, new ABTTGamer());
 
-            GamePlayer47MCGamer player = new GamePlayer47MCGamer(9147, new MCGamer());
+            GamePlayer54Random3 player = new GamePlayer54Random3(9152, new RandomGamer());
             player.run();
            System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {
