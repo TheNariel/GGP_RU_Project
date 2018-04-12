@@ -162,7 +162,7 @@ public class MCSearchGoalDistance {
 					}
 					moveScore.add(evaluateState(nextState, timeout));
 				}
-
+System.out.println("moveScore: "+moveScore);
 				while (true) {
 					moves = legalMoves.get(getIndexOfLargest(moveScore));
 					List<Integer> indexesOfMoves = new ArrayList<>();
@@ -175,6 +175,7 @@ public class MCSearchGoalDistance {
 						break;
 					}
 				}
+
 				indexes = new ArrayList<Integer>();
 				for (int r = 0; r < node.legalActions.size(); r++) {
 					for (int a = 0; a < node.legalActions.get(r).size(); a++) {
