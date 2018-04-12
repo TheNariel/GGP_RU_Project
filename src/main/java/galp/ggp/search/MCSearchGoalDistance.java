@@ -175,7 +175,15 @@ public class MCSearchGoalDistance {
 						break;
 					}
 				}
-
+				indexes = new ArrayList<Integer>();
+				for (int r = 0; r < node.legalActions.size(); r++) {
+					for (int a = 0; a < node.legalActions.get(r).size(); a++) {
+						if (moves.get(r).equals(node.legalActions.get(r).get(a))) {
+							indexes.add(a);
+							break;
+						}
+					}
+				}
 				MachineState nextstate = originalPropNetStateMachine.getNextState(node.state, moves);
 				Node next = initNextNode(nextstate, node, indexes);
 				// Check if new state is a terminal state

@@ -12,6 +12,7 @@ import org.ggp.base.util.gdl.factory.exceptions.GdlFormatException;
 import org.ggp.base.util.gdl.grammar.Gdl;
 import org.ggp.base.util.gdl.grammar.GdlSentence;
 import org.ggp.base.util.gdl.grammar.GdlTerm;
+import org.ggp.base.util.statemachine.MachineState;
 import org.ggp.base.util.statemachine.Move;
 import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
@@ -67,6 +68,8 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
 			System.out.println(legalMove);
 		}
+		MachineState cs = getCurrentState();
+		assert(root.state.equals(cs));
 		return search.search(root, timeout, getRole());
 	}
 

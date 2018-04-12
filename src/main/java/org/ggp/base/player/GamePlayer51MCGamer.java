@@ -19,7 +19,7 @@ import org.ggp.base.util.observer.Event;
 import org.ggp.base.util.observer.Observer;
 import org.ggp.base.util.observer.Subject;
 
-import galp.ggp.gamer.MCGamer;
+import galp.ggp.gamer.MCGamerGoalDistanceHeuristics;
 
 
 public final class GamePlayer51MCGamer extends Thread implements Subject
@@ -163,7 +163,7 @@ public final class GamePlayer51MCGamer extends Thread implements Subject
 
            // GamePlayer player = new GamePlayer(9148, new ABTTGamer());
 
-            GamePlayer51MCGamer player = new GamePlayer51MCGamer(9151, new MCGamer());
+            GamePlayer51MCGamer player = new GamePlayer51MCGamer(9151, new MCGamerGoalDistanceHeuristics());
             player.run();
            System.out.println("gamer runs at:"+ player.port);
         } catch (NumberFormatException e) {
