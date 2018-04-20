@@ -37,7 +37,7 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
 
 		List<GdlTerm> lastMoves = getMatch().getMostRecentMoves();
-		System.out.println("::: LastMoves" + lastMoves);
+//		System.out.println("::: LastMoves" + lastMoves);
 
 		if (lastMoves != null) {
 			List<Integer> jointMove = new ArrayList<Integer>();
@@ -62,13 +62,13 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 //		assert(root.state.equals(getCurrentState()));
 
 
-		System.out.println("::: currentState " + l);
+//		System.out.println("::: currentState " + l);
 		if (root == null)
 			root = search.initNextNode(getCurrentState(), null, null);
-		System.out.println(":::::::: LegalMoves before search, after reducePropNet creation");
-		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
-			System.out.println(legalMove);
-		}
+//		System.out.println(":::::::: LegalMoves before search, after reducePropNet creation");
+//		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
+//			System.out.println(legalMove);
+//		}
 		MachineState cs = getCurrentState();
 		assert(root.state.equals(cs));
 		return search.search(root, timeout, getRole());
