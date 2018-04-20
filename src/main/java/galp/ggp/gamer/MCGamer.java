@@ -32,7 +32,8 @@ public class MCGamer extends TrialSampleGamer {
 				r++;
 			}
 			root = root.exploredChildren.get(jointMove.toString());
-
+			//fix for a "problem" need to copy it to all other Mc based gamers
+			root.parent=null;
 		}
 		if (root == null)
 			root = search.initNextNode(getCurrentState(), null, null);
