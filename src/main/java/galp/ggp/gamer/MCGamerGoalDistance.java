@@ -23,14 +23,16 @@ import galp.ggp.search.MCSearchGoalDistance;
 import galp.ggp.search.Node;
 import galp.ggp.statemachine.TrialPropNetStateMachine;
 
-public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
+public class MCGamerGoalDistance extends TrialSampleGamer {
+	//Debug options
+	boolean printRules = false;
+
 	int nStates;
 	Node root;
 	MCSearchGoalDistance search;
 	TrialPropNetStateMachine orginalStateMachine;
 	TrialPropNetStateMachine reducedStateMachine;
-	//Debug options
-	boolean printRules = false;
+
 
 	@Override
 	public Move stateMachineSelectMove(long timeout)
@@ -47,7 +49,6 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 				r++;
 			}
 			root = root.exploredChildren.get(jointMove.toString());
-			//fix for a "problem" need to copy it to all other Mc based gamers
 			root.parent=null;
 		}
 		List<GdlSentence> l = new ArrayList<>(getCurrentState().getContents());
@@ -58,15 +59,13 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 			}
 		});
 
-
 //		assert(root.state.equals(getCurrentState()));
-
 
 //		System.out.println("::: currentState " + l);
 		if (root == null)
 			root = search.initNextNode(getCurrentState(), null, null);
-//		System.out.println(":::::::: LegalMoves before search, after reducePropNet creation");
-//		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
+//		System.out.println(":::::::::::::::::::::::::::: LegalMoves - Original state machine");
+////		for(Move legalMove: orginalStateMachine.getLegalMoves(root.state, getRole())) {
 //			System.out.println(legalMove);
 //		}
 		MachineState cs = getCurrentState();
@@ -77,7 +76,6 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 	@Override
 	public void stateMachineMetaGame(long timeout)
 			throws TransitionDefinitionException, MoveDefinitionException, GoalDefinitionException {
-
 
 		// Get original StateMachine
 		orginalStateMachine = (TrialPropNetStateMachine) getStateMachine();
@@ -92,6 +90,7 @@ public class MCGamerGoalDistanceHeuristics extends TrialSampleGamer {
 		// Create trialPropNetStateMachine
 		reducedStateMachine = new TrialPropNetStateMachine();
 
+		// Reduce rules
 		List<Gdl> reducedRules = null;
 		reducedRules = reduceRules(copiedRules);
 

@@ -110,8 +110,8 @@ public class MCSearchGoalDistance {
 		List<Move> moves;
 //		System.out.println("running mcSearch");
 
-		while (nStates < 1000 ) {
-//		while (System.currentTimeMillis() + timeoutBuffer <= timeout) {
+//		while (nStates < 1000 ) {
+		while (System.currentTimeMillis() + timeoutBuffer <= timeout) {
 			nStates++;
 			Node node = root;
 			// selection selection(node) chooses the best actions for all players and if we
@@ -162,8 +162,8 @@ public class MCSearchGoalDistance {
 						moveScore.add(evaluateState(nextState, timeout));
 					}
 
-					//				System.out.println("Movescore");
-					//				System.out.println(moveScore);
+									System.out.println("Movescore");
+									System.out.println(moveScore);
 
 					// select move with highest score
 					while (true) {
